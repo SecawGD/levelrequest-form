@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Level Request | secaw.me</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0f0f0f;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .form-container {
+            background-color: #1a1a1a;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            width: 100%;
+            max-width: 400px;
+        }
+        h2 { text-align: center; color: #00d4ff; }
+        .input-group { margin-bottom: 1.5rem; }
+        label { display: block; margin-bottom: 0.5rem; font-size: 0.9rem; }
+        input, textarea {
+            width: 100%;
+            padding: 0.8rem;
+            background-color: #2a2a2a;
+            border: 1px solid #333;
+            border-radius: 6px;
+            color: white;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 1rem;
+            background-color: #00d4ff;
+            border: none;
+            border-radius: 6px;
+            color: #000;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover { background-color: #0099cc; }
+        #message { margin-top: 1rem; text-align: center; font-size: 0.85rem; }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <h2>Level Request</h2>
+    <form id="levelForm">
+        <div class="input-group">
+            <label for="username">Usuario (ID)</label>
+            <input type="text" id="username" required placeholder="Tu nombre en el juego">
+        </div>
+        <div class="input-group">
+            <label for="levelID">ID del Nivel</label>
+            <input type="number" id="levelID" required placeholder="12345678">
+        </div>
+        <button type="submit" id="submitBtn">Enviar Solicitud</button>
+    </form>
+    <div id="message"></div>
+</div>
+
+<script>
+    const form = document.getElementById('levelForm');
+    const messageDiv = document.getElementById('message');
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const username = document.getElementById('username').value;
+        const levelID = document.getElementById('levelID').value;
+        
+        messageDiv.innerText = "Verificando restricciones...";
+
+        // Aquí llamarás a tu Netlify Function
+        try {
+            const response = await fetch('/.netlify/functions/submit-request', {
+                method: 'POST',
+                body: JSON.stringify({ username, levelID })
+            });
+            const result = await response.json();
+            
+            if (response.ok) {
+                messageDiv.style.color = "#00ff88";
+                messageDiv.innerText = "¡Solicitud enviada con éxito!";
+                form.reset();
+            } else {
+                messageDiv.style.color = "#ff4444";
+                messageDiv.innerText = result.error || "Error al enviar.";
+            }
+        } catch (err) {
+            messageDiv.innerText = "Error de conexión.";
+        }
+    });
+</script>
+
+</body>
+</html>
