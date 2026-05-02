@@ -4,9 +4,8 @@ const { JWT } = require('google-auth-library');
 exports.handler = async (event) => {
     if (event.httpMethod !== "POST") return { statusCode: 405, body: "Method Not Allowed" };
 
-    const { username, levelID } = JSON.parse(event.body);
+    const { codigo, levelID } = JSON.parse(event.body);
     
-    // Configurar la conexión con Google
     const serviceAccountAuth = new JWT({
         email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
         key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n'),
@@ -17,12 +16,28 @@ exports.handler = async (event) => {
     
     try {
         await doc.loadInfo();
-        const sheet = doc.sheetsByIndex[0];
-        const rows = await sheet.getRows();
+        
+        // Asignamos las pestañas (0 es la primera, 1 es la segunda)
+        const sheetNiveles = doc.sheetsByIndex[0];
+        const sheetUsuarios = doc.sheetsByIndex[1];
 
-        // LÓGICA DE 7 DÍAS
+        // 1. VERIFICACIÓN DE IDENTIDAD
+        const usuariosRows = await sheetUsuarios.getRows();
+        const validUser = usuariosRows.find(row => row.get('codigo') === codigo);
+
+        if (!validUser) {
+            return {
+                statusCode: 403,
+                body: JSON.stringify({ error: "Código de acceso inválido o no reconocido." })
+            };
+        }
+
+        const nombreReal = validUser.get('nombre');
+
+        // 2. LÓGICA DE 7 DÍAS
+        const nivelesRows = await sheetNiveles.getRows();
         const now = new Date();
-        const userRow = rows.reverse().find(row => row.get('usuario') === username);
+        const userRow = nivelesRows.reverse().find(row => row.get('codigo') === codigo);
 
         if (userRow) {
             const lastDate = new Date(userRow.get('fecha'));
@@ -32,19 +47,19 @@ exports.handler = async (event) => {
                 const faltan = Math.ceil(7 - diffDays);
                 return {
                     statusCode: 403,
-                    body: JSON.stringify({ error: `Debes esperar ${faltan} días más para enviar otra solicitud.` })
+                    body: JSON.stringify({ error: `Hola ${nombreReal}, aún debes esperar ${faltan} días para enviar otro nivel.` })
                 };
             }
         }
 
-        // Si pasó la validación, guardar datos
-        await sheet.addRow({
+        // 3. GUARDAR SOLICITUD
+        await sheetNiveles.addRow({
             fecha: now.toISOString(),
-            usuario: username,
+            codigo: codigo,
             levelID: levelID
         });
 
-        return { statusCode: 200, body: JSON.stringify({ message: "¡Éxito!" }) };
+        return { statusCode: 200, body: JSON.stringify({ message: `¡Éxito, ${nombreReal}! Nivel enviado.` }) };
     } catch (err) {
         return { statusCode: 500, body: JSON.stringify({ error: err.message }) };
     }
