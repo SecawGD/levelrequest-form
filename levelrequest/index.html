@@ -1,27 +1,44 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Level Request</title>
     <style>
         :root {
-            --bg-color: #0f1411; /* Verde muy oscuro */
-            --container-bg: #151c17;
-            --border-color: #2a382e;
-            --accent: #8bc34a; /* Verde claro estilo Tally */
+            --bg-main: #131b16; /* Tally dark green background */
+            --bg-input: #1a231d;
+            --border-color: #2c3b31;
             --text-main: #e0e6e2;
-            --text-muted: #84948a;
+            --text-muted: #8e9b92;
+            --accent-green: #a0d175;
+            
+            /* Tally Option Active Colors */
+            --active-bg: #162a36;
+            --active-border: #24496b;
+            --active-letter-bg: #285d8c;
+            
+            /* Tags Colors */
+            --tag-pink: #fce4ec; --tag-pink-text: #c2185b;
+            --tag-yellow: #fff8e1; --tag-yellow-text: #f57f17;
+            --tag-red: #ffebee; --tag-red-text: #d32f2f;
+            --tag-blue: #e3f2fd; --tag-blue-text: #1976d2;
+            --tag-purple: #f3e5f5; --tag-purple-text: #7b1fa2;
+            --tag-grey: #f5f5f5; --tag-grey-text: #616161;
         }
 
+        * { box-sizing: border-box; }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
+            font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-main);
             color: var(--text-main);
             margin: 0;
-            padding: 2rem 1rem;
+            padding: 3rem 1.5rem;
             display: flex;
             justify-content: center;
+            line-height: 1.5;
         }
 
         .form-container {
@@ -30,115 +47,182 @@
         }
 
         h1 {
-            color: var(--accent);
-            font-size: 2rem;
-            margin-bottom: 2rem;
+            color: var(--accent-green);
+            font-size: 2.2rem;
+            margin-bottom: 2.5rem;
+            font-weight: 700;
+        }
+
+        h2 {
+            color: var(--accent-green);
+            font-size: 1.5rem;
+            margin-bottom: 0.2rem;
+            font-weight: 700;
         }
 
         .question-group {
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
+            animation: fadeIn 0.3s ease-in-out;
         }
 
         .question-title {
             font-weight: 600;
+            font-size: 1rem;
             margin-bottom: 0.5rem;
-            font-size: 1.05rem;
         }
         
-        .question-title span { color: var(--text-muted); font-weight: 400; font-size: 0.9rem; }
+        .req { color: var(--text-muted); font-weight: normal; }
 
         .sub-text {
             color: var(--text-muted);
             font-size: 0.85rem;
-            margin-bottom: 0.8rem;
-            margin-top: -0.3rem;
+            margin-bottom: 1rem;
+            margin-top: -0.2rem;
         }
 
+        /* Text Inputs */
         input[type="text"], input[type="number"], input[type="url"], textarea {
             width: 100%;
             padding: 0.8rem 1rem;
-            background-color: var(--container-bg);
+            background-color: var(--bg-input);
             border: 1px solid var(--border-color);
-            border-radius: 8px;
+            border-radius: 6px;
             color: var(--text-main);
-            font-size: 1rem;
-            box-sizing: border-box;
-            transition: border 0.3s;
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: all 0.2s;
         }
 
         input:focus, textarea:focus {
             outline: none;
-            border-color: var(--accent);
+            border-color: var(--text-muted);
+            background-color: #1e2821;
         }
 
-        /* Estilo para los botones de selección (Radio y Checkbox) */
+        textarea { resize: vertical; min-height: 80px; }
+
+        /* Tally Radio/Checkbox Options */
         .options-list {
             display: flex;
             flex-direction: column;
-            gap: 0.5rem;
+            gap: 0.4rem;
         }
 
-        .option-label {
+        .tally-option {
             display: flex;
             align-items: center;
-            background-color: var(--container-bg);
+            padding: 0.6rem 0.8rem;
+            background-color: var(--bg-input);
             border: 1px solid var(--border-color);
-            padding: 0.8rem 1rem;
-            border-radius: 8px;
+            border-radius: 6px;
             cursor: pointer;
             transition: all 0.2s;
+            font-size: 0.95rem;
+            user-select: none;
         }
 
-        .option-label:hover {
-            border-color: var(--accent);
-        }
+        .tally-option input { display: none; }
 
-        .option-label input {
-            margin-right: 1rem;
-            accent-color: var(--accent);
-        }
-
-        /* Ocultar elementos lógicos */
-        .hidden {
-            display: none !important;
-        }
-
-        .divider {
-            height: 1px;
+        .tally-option .letter {
             background-color: var(--border-color);
-            margin: 3rem 0;
-        }
-
-        button.submit-btn {
-            background-color: var(--accent);
-            color: #000;
-            border: none;
-            padding: 1rem 2rem;
-            font-size: 1rem;
+            color: var(--text-main);
+            font-size: 0.75rem;
             font-weight: bold;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: opacity 0.3s;
-            margin-top: 1rem;
-        }
-
-        button.submit-btn:hover { opacity: 0.8; }
-
-        #message {
-            margin-top: 1.5rem;
-            font-weight: bold;
-            padding: 1rem;
-            border-radius: 8px;
+            padding: 0.1rem 0.4rem;
+            border-radius: 4px;
+            margin-right: 0.8rem;
+            min-width: 22px;
             text-align: center;
         }
 
-        /* Tags grid */
-        .tags-grid {
+        /* Active state for Options */
+        .tally-option.active {
+            background-color: var(--active-bg);
+            border-color: var(--active-border);
+        }
+
+        .tally-option.active .letter {
+            background-color: var(--active-letter-bg);
+            color: #fff;
+        }
+
+        /* Tags / Pills */
+        .tags-container {
             display: flex;
             flex-wrap: wrap;
             gap: 0.5rem;
+            background-color: var(--bg-input);
+            border: 1px solid var(--border-color);
+            padding: 0.8rem;
+            border-radius: 6px;
         }
-        .tags-grid .option-label { padding: 0.5rem 1rem; }
+
+        .tag-pill {
+            cursor: pointer;
+            padding: 0.3rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            transition: opacity 0.2s;
+        }
+        .tag-pill input { display: none; }
+        .tag-pill:hover { opacity: 0.8; }
+        .tag-pill:not(.active) { background-color: var(--bg-main) !important; color: var(--text-muted) !important; border: 1px solid var(--border-color); }
+
+        .c-pink { background-color: var(--tag-pink); color: var(--tag-pink-text); }
+        .c-yellow { background-color: var(--tag-yellow); color: var(--tag-yellow-text); }
+        .c-red { background-color: var(--tag-red); color: var(--tag-red-text); }
+        .c-blue { background-color: var(--tag-blue); color: var(--tag-blue-text); }
+        .c-purple { background-color: var(--tag-purple); color: var(--tag-purple-text); }
+        .c-grey { background-color: var(--tag-grey); color: var(--tag-grey-text); }
+
+        /* Stars Rating */
+        .stars-container {
+            display: flex;
+            gap: 0.3rem;
+            font-size: 1.8rem;
+            cursor: pointer;
+            color: var(--border-color);
+        }
+        .star { transition: color 0.2s; }
+        .star:hover, .star.active { color: #facc15; }
+
+        /* Utilities */
+        .hidden { display: none !important; }
+        .divider { height: 1px; background-color: var(--border-color); margin: 3rem 0 2rem 0; }
+
+        /* Submit Button */
+        .submit-btn {
+            background-color: #000;
+            color: var(--accent-green);
+            border: none;
+            padding: 0.8rem 1.5rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: opacity 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .submit-btn:hover { opacity: 0.8; }
+
+        #message {
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            padding: 1rem;
+            border-radius: 6px;
+            background-color: var(--bg-input);
+            border: 1px solid var(--border-color);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body>
@@ -147,119 +231,139 @@
     <h1>Level Request</h1>
     <form id="levelForm">
 
+        <!-- Access Code (Added for security system) -->
         <div class="question-group">
-            <div class="question-title">Access Code *</div>
-            <div class="sub-text">Your private identity code.</div>
+            <div class="question-title">Access Code <span class="req">*</span></div>
+            <div class="sub-text">Your private identity code for this community.</div>
             <input type="text" id="codigo" required placeholder="e.g. 8472">
         </div>
 
+        <!-- Level ID -->
         <div class="question-group">
-            <div class="question-title">ID of your level *</div>
-            <input type="number" id="levelID" required placeholder="12345678">
+            <div class="question-title">ID of your level <span class="req">*</span></div>
+            <input type="number" id="levelID" required placeholder="134498865">
         </div>
 
+        <!-- Ownership -->
         <div class="question-group">
-            <div class="question-title">Is the level yours? *</div>
-            <div class="options-list">
-                <label class="option-label"><input type="radio" name="ownership" value="Yes" required> Yes, I made the level</label>
-                <label class="option-label"><input type="radio" name="ownership" value="Partially"> I made the level partially (collab)</label>
-                <label class="option-label"><input type="radio" name="ownership" value="No"> No, I'm not involved in the creation</label>
+            <div class="question-title">Is the level yours? <span class="req">*</span></div>
+            <div class="options-list radio-group">
+                <label class="tally-option"><input type="radio" name="ownership" value="Yes" required><span class="letter">A</span> Yes, I made the level</label>
+                <label class="tally-option"><input type="radio" name="ownership" value="Partially"><span class="letter">B</span> I made the level partially (collab)</label>
+                <label class="tally-option"><input type="radio" name="ownership" value="No"><span class="letter">C</span> No, I'm not involved in the creation of the level</label>
             </div>
         </div>
 
+        <!-- Conditional: Parts -->
         <div class="question-group hidden" id="group-parts">
             <div class="question-title">Please, tell me what parts of the level are yours</div>
-            <textarea id="parts" rows="3" placeholder="e.g. 30% to 45% (Spider part)"></textarea>
+            <textarea id="parts" placeholder="e.g. 30% to 45%"></textarea>
         </div>
 
+        <!-- Conditional: Permission -->
         <div class="question-group hidden" id="group-permission">
-            <div class="question-title">Do you have the permission of the creator(s)?</div>
-            <div class="options-list">
-                <label class="option-label"><input type="radio" name="permission" value="Yes"> Yes</label>
-                <label class="option-label"><input type="radio" name="permission" value="No"> No</label>
+            <div class="question-title">Do you have the permission of the creator(s) of the level?</div>
+            <div class="sub-text">I can't give feedback if the creator didn't approve it.</div>
+            <div class="options-list radio-group">
+                <label class="tally-option"><input type="radio" name="permission" value="Yes"><span class="letter">A</span> Yes</label>
+                <label class="tally-option"><input type="radio" name="permission" value="No"><span class="letter">B</span> No</label>
             </div>
         </div>
 
+        <!-- Difficulty -->
         <div class="question-group">
-            <div class="question-title">Which difficulty would you consider your level? *</div>
-            <div class="options-list">
-                <label class="option-label"><input type="radio" name="difficulty" value="Auto" required> Auto</label>
-                <label class="option-label"><input type="radio" name="difficulty" value="Easy"> Easy</label>
-                <label class="option-label"><input type="radio" name="difficulty" value="Normal"> Normal</label>
-                <label class="option-label"><input type="radio" name="difficulty" value="Hard"> Hard</label>
-                <label class="option-label"><input type="radio" name="difficulty" value="Harder"> Harder</label>
-                <label class="option-label"><input type="radio" name="difficulty" value="Insane"> Insane</label>
-                <label class="option-label"><input type="radio" name="difficulty" value="Easy Demon"> Easy Demon</label>
-                <label class="option-label"><input type="radio" name="difficulty" value="Medium Demon"> Medium Demon</label>
-                <label class="option-label"><input type="radio" name="difficulty" value="Hard Demon"> Hard Demon</label>
-                <label class="option-label"><input type="radio" name="difficulty" value="Insane Demon"> Insane Demon</label>
-                <label class="option-label"><input type="radio" name="difficulty" value="Extreme Demon"> Extreme Demon</label>
+            <div class="question-title">Which difficulty would <u>you</u> consider your level? <span class="req">*</span></div>
+            <div class="options-list radio-group">
+                <label class="tally-option"><input type="radio" name="difficulty" value="Auto" required><span class="letter">A</span> Auto</label>
+                <label class="tally-option"><input type="radio" name="difficulty" value="Easy"><span class="letter">B</span> Easy</label>
+                <label class="tally-option"><input type="radio" name="difficulty" value="Normal"><span class="letter">C</span> Normal</label>
+                <label class="tally-option"><input type="radio" name="difficulty" value="Hard"><span class="letter">D</span> Hard</label>
+                <label class="tally-option"><input type="radio" name="difficulty" value="Harder"><span class="letter">E</span> Harder</label>
+                <label class="tally-option"><input type="radio" name="difficulty" value="Insane"><span class="letter">F</span> Insane</label>
+                <label class="tally-option"><input type="radio" name="difficulty" value="Easy Demon"><span class="letter">G</span> Easy Demon</label>
+                <label class="tally-option"><input type="radio" name="difficulty" value="Medium Demon"><span class="letter">H</span> Medium Demon</label>
+                <label class="tally-option"><input type="radio" name="difficulty" value="Hard Demon"><span class="letter">I</span> Hard Demon</label>
+                <label class="tally-option"><input type="radio" name="difficulty" value="Insane Demon"><span class="letter">J</span> Insane Demon</label>
+                <label class="tally-option"><input type="radio" name="difficulty" value="Extreme Demon"><span class="letter">K</span> Extreme Demon</label>
             </div>
         </div>
 
-        <div class="question-group">
+        <!-- Conditional: Video -->
+        <div class="question-group hidden" id="group-video">
             <div class="question-title">Video of your level</div>
             <div class="sub-text">Only necessary if it's a demon level</div>
-            <input type="url" id="video" placeholder="https://youtube.com/...">
+            <input type="url" id="video" placeholder="https://www.youtube.com...">
         </div>
 
+        <!-- Tags -->
         <div class="question-group">
-            <div class="question-title">Describe your level with one or more tags</div>
-            <div class="tags-grid">
-                <label class="option-label"><input type="checkbox" name="tags" value="Lyrics"> Lyrics</label>
-                <label class="option-label"><input type="checkbox" name="tags" value="Visual FX"> Visual FX</label>
-                <label class="option-label"><input type="checkbox" name="tags" value="Fast"> Fast</label>
-                <label class="option-label"><input type="checkbox" name="tags" value="Fun"> Fun</label>
-                <label class="option-label"><input type="checkbox" name="tags" value="Abstract"> Abstract</label>
-                <label class="option-label"><input type="checkbox" name="tags" value="Other"> Other</label>
+            <div class="question-title">Describe your level with one or more tags <span class="req">*</span></div>
+            <div class="tags-container">
+                <label class="tag-pill c-pink"><input type="checkbox" name="tags" value="Lyrics"> Lyrics</label>
+                <label class="tag-pill c-yellow"><input type="checkbox" name="tags" value="Visual FX"> Visual FX</label>
+                <label class="tag-pill c-red"><input type="checkbox" name="tags" value="Fast"> Fast</label>
+                <label class="tag-pill c-blue"><input type="checkbox" name="tags" value="Fun"> Fun</label>
+                <label class="tag-pill c-purple"><input type="checkbox" name="tags" value="Abstract"> Abstract</label>
+                <label class="tag-pill c-grey"><input type="checkbox" name="tags" value="Other"> Other</label>
             </div>
-            <input type="text" id="otherTagInput" class="hidden" style="margin-top: 0.5rem;" placeholder="Type your tag...">
+            <input type="text" id="otherTagInput" class="hidden" style="margin-top: 0.8rem;" placeholder="Type your other tag...">
         </div>
 
         <div class="divider"></div>
+
         <h2>Additional Information</h2>
-        <div class="sub-text" style="margin-bottom: 2rem;">This is also very important for me to know</div>
+        <div class="sub-text" style="margin-bottom: 2.5rem;">This is also very important for me to know</div>
 
+        <!-- Rated -->
         <div class="question-group">
-            <div class="question-title">Is your level star rated? *</div>
-            <div class="options-list">
-                <label class="option-label"><input type="radio" name="rated" value="No" required> No</label>
-                <label class="option-label"><input type="radio" name="rated" value="Yes"> Yes</label>
+            <div class="question-title">Is your level star rated? <span class="req">*</span></div>
+            <div class="sub-text">(I also give feedback on rated levels, but unrated levels have more priority)</div>
+            <div class="options-list radio-group">
+                <label class="tally-option"><input type="radio" name="rated" value="No" required><span class="letter">A</span> No</label>
+                <label class="tally-option"><input type="radio" name="rated" value="Yes"><span class="letter">B</span> Yes</label>
             </div>
         </div>
 
+        <!-- Conditional: Stars -->
         <div class="question-group hidden" id="group-stars">
-            <div class="question-title">How many stars does your level have?</div>
-            <input type="number" id="stars" min="1" max="10" placeholder="e.g. 5">
+            <div class="question-title">How many stars does your level have? <span class="req">*</span></div>
+            <div class="stars-container" id="starRating">
+                <span class="star" data-val="1">★</span><span class="star" data-val="2">★</span><span class="star" data-val="3">★</span><span class="star" data-val="4">★</span><span class="star" data-val="5">★</span><span class="star" data-val="6">★</span><span class="star" data-val="7">★</span><span class="star" data-val="8">★</span><span class="star" data-val="9">★</span><span class="star" data-val="10">★</span>
+            </div>
+            <input type="hidden" id="starsValue" value="0">
         </div>
 
+        <!-- Preview -->
         <div class="question-group">
-            <div class="question-title">Is your level a Preview? *</div>
-            <div class="options-list">
-                <label class="option-label"><input type="radio" name="preview" value="Yes" required> Yes, it is a preview</label>
-                <label class="option-label"><input type="radio" name="preview" value="No"> No, it is a full level</label>
+            <div class="question-title">Is your level a Preview? <span class="req">*</span></div>
+            <div class="options-list radio-group">
+                <label class="tally-option"><input type="radio" name="preview" value="Yes" required><span class="letter">A</span> Yes, my level is a preview (an incompleted level)</label>
+                <label class="tally-option"><input type="radio" name="preview" value="No"><span class="letter">B</span> No, my level is not a preview</label>
             </div>
         </div>
 
+        <!-- Something else -->
         <div class="question-group">
-            <div class="question-title">Do you want to say something else? *</div>
-            <div class="options-list">
-                <label class="option-label"><input type="radio" name="commentsCheck" value="Yes" required> Yes!</label>
-                <label class="option-label"><input type="radio" name="commentsCheck" value="No"> Nope, that's everything!</label>
+            <div class="question-title">Do you want to say something else? <span class="req">*</span></div>
+            <div class="options-list radio-group">
+                <label class="tally-option"><input type="radio" name="commentsCheck" value="Yes" required><span class="letter">A</span> Yes! I want to say something else.</label>
+                <label class="tally-option"><input type="radio" name="commentsCheck" value="No"><span class="letter">B</span> Nope, that's everything!</label>
             </div>
         </div>
 
+        <!-- Conditional: Comments -->
         <div class="question-group hidden" id="group-comments">
             <div class="question-title">What else do you want to add?</div>
-            <textarea id="comments" rows="3" placeholder="I made the level in only 2 months!"></textarea>
+            <textarea id="comments" placeholder="I made the level in only 2 months!"></textarea>
         </div>
 
+        <!-- Feedback Type -->
         <div class="question-group">
-            <div class="question-title">Do you prefer a public or private feedback? *</div>
-            <div class="options-list">
-                <label class="option-label"><input type="radio" name="feedback" value="Public" required> I want you to make a public feedback</label>
-                <label class="option-label"><input type="radio" name="feedback" value="Ask"> Ask before making it public</label>
-                <label class="option-label"><input type="radio" name="feedback" value="Private"> I just want a private feedback</label>
+            <div class="question-title">Do you prefer a public or private feedback? <span class="req">*</span></div>
+            <div class="options-list radio-group">
+                <label class="tally-option"><input type="radio" name="feedback" value="Public" required><span class="letter">A</span> I want you to make a public feedback</label>
+                <label class="tally-option"><input type="radio" name="feedback" value="Ask"><span class="letter">B</span> Ask before making it public</label>
+                <label class="tally-option"><input type="radio" name="feedback" value="Private"><span class="letter">C</span> I just want a private feedback</label>
             </div>
         </div>
 
@@ -270,21 +374,62 @@
 </div>
 
 <script>
-    // LÓGICA CONDICIONAL (Mostrar/Ocultar campos)
-    const form = document.getElementById('levelForm');
+    // --- UI LOGIC (Tally Styling) ---
+    
+    // Custom Radio Buttons
+    document.querySelectorAll('.radio-group').forEach(group => {
+        const options = group.querySelectorAll('.tally-option');
+        options.forEach(opt => {
+            const input = opt.querySelector('input');
+            input.addEventListener('change', () => {
+                options.forEach(o => o.classList.remove('active'));
+                if (input.checked) opt.classList.add('active');
+            });
+        });
+    });
+
+    // Custom Tag Pills (Checkboxes)
+    const tagPills = document.querySelectorAll('.tag-pill');
+    tagPills.forEach(pill => {
+        const input = pill.querySelector('input');
+        input.addEventListener('change', () => {
+            pill.classList.toggle('active', input.checked);
+        });
+    });
+
+    // 10-Star Rating Logic
+    const stars = document.querySelectorAll('.star');
+    const starsInput = document.getElementById('starsValue');
+    stars.forEach(star => {
+        star.addEventListener('click', () => {
+            const val = parseInt(star.getAttribute('data-val'));
+            starsInput.value = val;
+            stars.forEach(s => {
+                s.classList.toggle('active', parseInt(s.getAttribute('data-val')) <= val);
+            });
+        });
+    });
+
+    // --- CONDITIONAL LOGIC ---
 
     // Ownership logic
-    const ownershipRadios = document.querySelectorAll('input[name="ownership"]');
-    ownershipRadios.forEach(radio => {
+    document.querySelectorAll('input[name="ownership"]').forEach(radio => {
         radio.addEventListener('change', (e) => {
             document.getElementById('group-parts').classList.toggle('hidden', e.target.value !== 'Partially');
             document.getElementById('group-permission').classList.toggle('hidden', e.target.value !== 'No');
         });
     });
 
-    // Tags logic (Other)
-    const tagsCheckboxes = document.querySelectorAll('input[name="tags"]');
-    tagsCheckboxes.forEach(chk => {
+    // Difficulty (Demon = Video) logic
+    document.querySelectorAll('input[name="difficulty"]').forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            const isDemon = e.target.value.includes('Demon');
+            document.getElementById('group-video').classList.toggle('hidden', !isDemon);
+        });
+    });
+
+    // Tags (Other = Text Input)
+    document.querySelectorAll('input[name="tags"]').forEach(chk => {
         chk.addEventListener('change', (e) => {
             if (e.target.value === 'Other') {
                 document.getElementById('otherTagInput').classList.toggle('hidden', !e.target.checked);
@@ -292,53 +437,64 @@
         });
     });
 
-    // Rated logic
-    const ratedRadios = document.querySelectorAll('input[name="rated"]');
-    ratedRadios.forEach(radio => {
+    // Rated (Yes = Stars) logic
+    document.querySelectorAll('input[name="rated"]').forEach(radio => {
         radio.addEventListener('change', (e) => {
             document.getElementById('group-stars').classList.toggle('hidden', e.target.value !== 'Yes');
         });
     });
 
-    // Comments logic
-    const commentsRadios = document.querySelectorAll('input[name="commentsCheck"]');
-    commentsRadios.forEach(radio => {
+    // Say something else logic
+    document.querySelectorAll('input[name="commentsCheck"]').forEach(radio => {
         radio.addEventListener('change', (e) => {
             document.getElementById('group-comments').classList.toggle('hidden', e.target.value !== 'Yes');
         });
     });
 
-    // ENVÍO DE DATOS
+
+    // --- FORM SUBMIT LOGIC ---
+    const form = document.getElementById('levelForm');
     const messageDiv = document.getElementById('message');
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        messageDiv.classList.remove('hidden');
-        messageDiv.innerText = "Verifying identity...";
-        messageDiv.style.backgroundColor = "transparent";
-        messageDiv.style.color = "var(--text-main)";
-
-        // Recolectar etiquetas seleccionadas
+        
+        // Tags validation
         let selectedTags = Array.from(document.querySelectorAll('input[name="tags"]:checked')).map(cb => cb.value);
+        if (selectedTags.length === 0) {
+            alert("Please select at least one tag.");
+            return;
+        }
         if (selectedTags.includes('Other')) {
             const otherVal = document.getElementById('otherTagInput').value;
             if(otherVal) selectedTags.push(`Other: ${otherVal}`);
         }
 
-        // Construir el paquete de datos
+        // Stars validation if rated is Yes
+        if (document.querySelector('input[name="rated"]:checked')?.value === 'Yes' && starsInput.value === "0") {
+            alert("Please select a star rating.");
+            return;
+        }
+
+        messageDiv.classList.remove('hidden');
+        messageDiv.innerHTML = "Verifying identity and submitting...";
+        messageDiv.style.color = "var(--text-main)";
+        messageDiv.style.borderColor = "var(--border-color)";
+
+        // Payload
         const payload = {
             codigo: document.getElementById('codigo').value,
             levelID: document.getElementById('levelID').value,
             ownership: document.querySelector('input[name="ownership"]:checked')?.value,
-            parts: document.getElementById('parts').value,
-            permission: document.querySelector('input[name="permission"]:checked')?.value,
+            parts: document.getElementById('parts').value || 'N/A',
+            permission: document.querySelector('input[name="permission"]:checked')?.value || 'N/A',
             difficulty: document.querySelector('input[name="difficulty"]:checked')?.value,
-            video: document.getElementById('video').value,
+            video: document.getElementById('video').value || 'N/A',
             tags: selectedTags.join(', '),
             rated: document.querySelector('input[name="rated"]:checked')?.value,
-            stars: document.getElementById('stars').value,
+            stars: document.querySelector('input[name="rated"]:checked')?.value === 'Yes' ? starsInput.value : 'N/A',
             preview: document.querySelector('input[name="preview"]:checked')?.value,
-            comments: document.getElementById('comments').value,
+            comments: document.getElementById('comments').value || 'N/A',
             feedback: document.querySelector('input[name="feedback"]:checked')?.value
         };
 
@@ -350,24 +506,33 @@
             const result = await response.json();
             
             if (response.ok) {
-                messageDiv.style.backgroundColor = "rgba(139, 195, 74, 0.2)";
-                messageDiv.style.color = "var(--accent)";
-                messageDiv.innerText = result.message;
+                messageDiv.style.color = "var(--accent-green)";
+                messageDiv.style.borderColor = "var(--accent-green)";
+                messageDiv.innerHTML = "✅ " + result.message;
+                
+                // Reset form visuals
                 form.reset();
-                // Ocultar condicionales de nuevo
-                document.querySelectorAll('.hidden').forEach(el => el.classList.add('hidden'));
+                document.querySelectorAll('.tally-option').forEach(o => o.classList.remove('active'));
+                document.querySelectorAll('.tag-pill').forEach(p => p.classList.remove('active'));
+                document.querySelectorAll('.star').forEach(s => s.classList.remove('active'));
+                starsInput.value = "0";
+                document.querySelectorAll('.hidden:not(#message, #otherTagInput)').forEach(el => el.classList.add('hidden'));
+                document.getElementById('otherTagInput').classList.add('hidden');
+
             } else {
-                messageDiv.style.backgroundColor = "rgba(255, 68, 68, 0.2)";
-                messageDiv.style.color = "#ff4444";
-                messageDiv.innerText = result.error || "Error submitting.";
+                messageDiv.style.color = "#ff4d4d";
+                messageDiv.style.borderColor = "#ff4d4d";
+                messageDiv.innerHTML = "❌ " + (result.error || "Error submitting.");
             }
         } catch (err) {
-            messageDiv.style.backgroundColor = "rgba(255, 68, 68, 0.2)";
-            messageDiv.style.color = "#ff4444";
-            messageDiv.innerText = "Connection error.";
+            messageDiv.style.color = "#ff4d4d";
+            messageDiv.style.borderColor = "#ff4d4d";
+            messageDiv.innerHTML = "❌ Connection error.";
         }
     });
 </script>
 
 </body>
 </html>
+
+```
