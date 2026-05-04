@@ -1,103 +1,370 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Level Request | secaw.me</title>
+    <title>Level Request</title>
     <style>
+        :root {
+            --bg-color: #0f1411; /* Verde muy oscuro */
+            --container-bg: #151c17;
+            --border-color: #2a382e;
+            --accent: #8bc34a; /* Verde claro estilo Tally */
+            --text-main: #e0e6e2;
+            --text-muted: #84948a;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #0f0f0f;
-            color: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 2rem 1rem;
             display: flex;
             justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
         }
+
         .form-container {
-            background-color: #1a1a1a;
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
             width: 100%;
-            max-width: 400px;
+            max-width: 600px;
         }
-        h2 { text-align: center; color: #00d4ff; }
-        .input-group { margin-bottom: 1.5rem; }
-        label { display: block; margin-bottom: 0.5rem; font-size: 0.9rem; }
-        input, textarea {
+
+        h1 {
+            color: var(--accent);
+            font-size: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .question-group {
+            margin-bottom: 2rem;
+        }
+
+        .question-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 1.05rem;
+        }
+        
+        .question-title span { color: var(--text-muted); font-weight: 400; font-size: 0.9rem; }
+
+        .sub-text {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-bottom: 0.8rem;
+            margin-top: -0.3rem;
+        }
+
+        input[type="text"], input[type="number"], input[type="url"], textarea {
             width: 100%;
-            padding: 0.8rem;
-            background-color: #2a2a2a;
-            border: 1px solid #333;
-            border-radius: 6px;
-            color: white;
+            padding: 0.8rem 1rem;
+            background-color: var(--container-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-main);
+            font-size: 1rem;
             box-sizing: border-box;
+            transition: border 0.3s;
         }
-        button {
-            width: 100%;
-            padding: 1rem;
-            background-color: #00d4ff;
-            border: none;
-            border-radius: 6px;
-            color: #000;
-            font-weight: bold;
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        /* Estilo para los botones de selección (Radio y Checkbox) */
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .option-label {
+            display: flex;
+            align-items: center;
+            background-color: var(--container-bg);
+            border: 1px solid var(--border-color);
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
             cursor: pointer;
-            transition: background 0.3s;
+            transition: all 0.2s;
         }
-        button:hover { background-color: #0099cc; }
-        #message { margin-top: 1rem; text-align: center; font-size: 0.85rem; font-weight: bold; }
+
+        .option-label:hover {
+            border-color: var(--accent);
+        }
+
+        .option-label input {
+            margin-right: 1rem;
+            accent-color: var(--accent);
+        }
+
+        /* Ocultar elementos lógicos */
+        .hidden {
+            display: none !important;
+        }
+
+        .divider {
+            height: 1px;
+            background-color: var(--border-color);
+            margin: 3rem 0;
+        }
+
+        button.submit-btn {
+            background-color: var(--accent);
+            color: #000;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: opacity 0.3s;
+            margin-top: 1rem;
+        }
+
+        button.submit-btn:hover { opacity: 0.8; }
+
+        #message {
+            margin-top: 1.5rem;
+            font-weight: bold;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        /* Tags grid */
+        .tags-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .tags-grid .option-label { padding: 0.5rem 1rem; }
     </style>
 </head>
 <body>
 
 <div class="form-container">
-    <h2>Level Request</h2>
+    <h1>Level Request</h1>
     <form id="levelForm">
-        <div class="input-group">
-            <label for="codigo">Código de Acceso</label>
-            <input type="text" id="codigo" required placeholder="Tu código secreto">
+
+        <div class="question-group">
+            <div class="question-title">Access Code *</div>
+            <div class="sub-text">Your private identity code.</div>
+            <input type="text" id="codigo" required placeholder="e.g. 8472">
         </div>
-        <div class="input-group">
-            <label for="levelID">ID del Nivel</label>
+
+        <div class="question-group">
+            <div class="question-title">ID of your level *</div>
             <input type="number" id="levelID" required placeholder="12345678">
         </div>
-        <button type="submit" id="submitBtn">Enviar Solicitud</button>
+
+        <div class="question-group">
+            <div class="question-title">Is the level yours? *</div>
+            <div class="options-list">
+                <label class="option-label"><input type="radio" name="ownership" value="Yes" required> Yes, I made the level</label>
+                <label class="option-label"><input type="radio" name="ownership" value="Partially"> I made the level partially (collab)</label>
+                <label class="option-label"><input type="radio" name="ownership" value="No"> No, I'm not involved in the creation</label>
+            </div>
+        </div>
+
+        <div class="question-group hidden" id="group-parts">
+            <div class="question-title">Please, tell me what parts of the level are yours</div>
+            <textarea id="parts" rows="3" placeholder="e.g. 30% to 45% (Spider part)"></textarea>
+        </div>
+
+        <div class="question-group hidden" id="group-permission">
+            <div class="question-title">Do you have the permission of the creator(s)?</div>
+            <div class="options-list">
+                <label class="option-label"><input type="radio" name="permission" value="Yes"> Yes</label>
+                <label class="option-label"><input type="radio" name="permission" value="No"> No</label>
+            </div>
+        </div>
+
+        <div class="question-group">
+            <div class="question-title">Which difficulty would you consider your level? *</div>
+            <div class="options-list">
+                <label class="option-label"><input type="radio" name="difficulty" value="Auto" required> Auto</label>
+                <label class="option-label"><input type="radio" name="difficulty" value="Easy"> Easy</label>
+                <label class="option-label"><input type="radio" name="difficulty" value="Normal"> Normal</label>
+                <label class="option-label"><input type="radio" name="difficulty" value="Hard"> Hard</label>
+                <label class="option-label"><input type="radio" name="difficulty" value="Harder"> Harder</label>
+                <label class="option-label"><input type="radio" name="difficulty" value="Insane"> Insane</label>
+                <label class="option-label"><input type="radio" name="difficulty" value="Easy Demon"> Easy Demon</label>
+                <label class="option-label"><input type="radio" name="difficulty" value="Medium Demon"> Medium Demon</label>
+                <label class="option-label"><input type="radio" name="difficulty" value="Hard Demon"> Hard Demon</label>
+                <label class="option-label"><input type="radio" name="difficulty" value="Insane Demon"> Insane Demon</label>
+                <label class="option-label"><input type="radio" name="difficulty" value="Extreme Demon"> Extreme Demon</label>
+            </div>
+        </div>
+
+        <div class="question-group">
+            <div class="question-title">Video of your level</div>
+            <div class="sub-text">Only necessary if it's a demon level</div>
+            <input type="url" id="video" placeholder="https://youtube.com/...">
+        </div>
+
+        <div class="question-group">
+            <div class="question-title">Describe your level with one or more tags</div>
+            <div class="tags-grid">
+                <label class="option-label"><input type="checkbox" name="tags" value="Lyrics"> Lyrics</label>
+                <label class="option-label"><input type="checkbox" name="tags" value="Visual FX"> Visual FX</label>
+                <label class="option-label"><input type="checkbox" name="tags" value="Fast"> Fast</label>
+                <label class="option-label"><input type="checkbox" name="tags" value="Fun"> Fun</label>
+                <label class="option-label"><input type="checkbox" name="tags" value="Abstract"> Abstract</label>
+                <label class="option-label"><input type="checkbox" name="tags" value="Other"> Other</label>
+            </div>
+            <input type="text" id="otherTagInput" class="hidden" style="margin-top: 0.5rem;" placeholder="Type your tag...">
+        </div>
+
+        <div class="divider"></div>
+        <h2>Additional Information</h2>
+        <div class="sub-text" style="margin-bottom: 2rem;">This is also very important for me to know</div>
+
+        <div class="question-group">
+            <div class="question-title">Is your level star rated? *</div>
+            <div class="options-list">
+                <label class="option-label"><input type="radio" name="rated" value="No" required> No</label>
+                <label class="option-label"><input type="radio" name="rated" value="Yes"> Yes</label>
+            </div>
+        </div>
+
+        <div class="question-group hidden" id="group-stars">
+            <div class="question-title">How many stars does your level have?</div>
+            <input type="number" id="stars" min="1" max="10" placeholder="e.g. 5">
+        </div>
+
+        <div class="question-group">
+            <div class="question-title">Is your level a Preview? *</div>
+            <div class="options-list">
+                <label class="option-label"><input type="radio" name="preview" value="Yes" required> Yes, it is a preview</label>
+                <label class="option-label"><input type="radio" name="preview" value="No"> No, it is a full level</label>
+            </div>
+        </div>
+
+        <div class="question-group">
+            <div class="question-title">Do you want to say something else? *</div>
+            <div class="options-list">
+                <label class="option-label"><input type="radio" name="commentsCheck" value="Yes" required> Yes!</label>
+                <label class="option-label"><input type="radio" name="commentsCheck" value="No"> Nope, that's everything!</label>
+            </div>
+        </div>
+
+        <div class="question-group hidden" id="group-comments">
+            <div class="question-title">What else do you want to add?</div>
+            <textarea id="comments" rows="3" placeholder="I made the level in only 2 months!"></textarea>
+        </div>
+
+        <div class="question-group">
+            <div class="question-title">Do you prefer a public or private feedback? *</div>
+            <div class="options-list">
+                <label class="option-label"><input type="radio" name="feedback" value="Public" required> I want you to make a public feedback</label>
+                <label class="option-label"><input type="radio" name="feedback" value="Ask"> Ask before making it public</label>
+                <label class="option-label"><input type="radio" name="feedback" value="Private"> I just want a private feedback</label>
+            </div>
+        </div>
+
+        <button type="submit" class="submit-btn">Submit ➔</button>
     </form>
-    <div id="message"></div>
+    
+    <div id="message" class="hidden"></div>
 </div>
 
 <script>
+    // LÓGICA CONDICIONAL (Mostrar/Ocultar campos)
     const form = document.getElementById('levelForm');
+
+    // Ownership logic
+    const ownershipRadios = document.querySelectorAll('input[name="ownership"]');
+    ownershipRadios.forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            document.getElementById('group-parts').classList.toggle('hidden', e.target.value !== 'Partially');
+            document.getElementById('group-permission').classList.toggle('hidden', e.target.value !== 'No');
+        });
+    });
+
+    // Tags logic (Other)
+    const tagsCheckboxes = document.querySelectorAll('input[name="tags"]');
+    tagsCheckboxes.forEach(chk => {
+        chk.addEventListener('change', (e) => {
+            if (e.target.value === 'Other') {
+                document.getElementById('otherTagInput').classList.toggle('hidden', !e.target.checked);
+            }
+        });
+    });
+
+    // Rated logic
+    const ratedRadios = document.querySelectorAll('input[name="rated"]');
+    ratedRadios.forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            document.getElementById('group-stars').classList.toggle('hidden', e.target.value !== 'Yes');
+        });
+    });
+
+    // Comments logic
+    const commentsRadios = document.querySelectorAll('input[name="commentsCheck"]');
+    commentsRadios.forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            document.getElementById('group-comments').classList.toggle('hidden', e.target.value !== 'Yes');
+        });
+    });
+
+    // ENVÍO DE DATOS
     const messageDiv = document.getElementById('message');
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const codigo = document.getElementById('codigo').value;
-        const levelID = document.getElementById('levelID').value;
-        
-        messageDiv.innerText = "Verificando identidad...";
-        messageDiv.style.color = "#ffffff";
+        messageDiv.classList.remove('hidden');
+        messageDiv.innerText = "Verifying identity...";
+        messageDiv.style.backgroundColor = "transparent";
+        messageDiv.style.color = "var(--text-main)";
+
+        // Recolectar etiquetas seleccionadas
+        let selectedTags = Array.from(document.querySelectorAll('input[name="tags"]:checked')).map(cb => cb.value);
+        if (selectedTags.includes('Other')) {
+            const otherVal = document.getElementById('otherTagInput').value;
+            if(otherVal) selectedTags.push(`Other: ${otherVal}`);
+        }
+
+        // Construir el paquete de datos
+        const payload = {
+            codigo: document.getElementById('codigo').value,
+            levelID: document.getElementById('levelID').value,
+            ownership: document.querySelector('input[name="ownership"]:checked')?.value,
+            parts: document.getElementById('parts').value,
+            permission: document.querySelector('input[name="permission"]:checked')?.value,
+            difficulty: document.querySelector('input[name="difficulty"]:checked')?.value,
+            video: document.getElementById('video').value,
+            tags: selectedTags.join(', '),
+            rated: document.querySelector('input[name="rated"]:checked')?.value,
+            stars: document.getElementById('stars').value,
+            preview: document.querySelector('input[name="preview"]:checked')?.value,
+            comments: document.getElementById('comments').value,
+            feedback: document.querySelector('input[name="feedback"]:checked')?.value
+        };
 
         try {
             const response = await fetch('/.netlify/functions/submit-request', {
                 method: 'POST',
-                body: JSON.stringify({ codigo, levelID })
+                body: JSON.stringify(payload)
             });
             const result = await response.json();
             
             if (response.ok) {
-                messageDiv.style.color = "#00ff88"; // Verde para éxito
+                messageDiv.style.backgroundColor = "rgba(139, 195, 74, 0.2)";
+                messageDiv.style.color = "var(--accent)";
                 messageDiv.innerText = result.message;
                 form.reset();
+                // Ocultar condicionales de nuevo
+                document.querySelectorAll('.hidden').forEach(el => el.classList.add('hidden'));
             } else {
-                messageDiv.style.color = "#ff4444"; // Rojo para errores (ej. código falso o regla de 7 días)
-                messageDiv.innerText = result.error || "Error al enviar.";
+                messageDiv.style.backgroundColor = "rgba(255, 68, 68, 0.2)";
+                messageDiv.style.color = "#ff4444";
+                messageDiv.innerText = result.error || "Error submitting.";
             }
         } catch (err) {
+            messageDiv.style.backgroundColor = "rgba(255, 68, 68, 0.2)";
             messageDiv.style.color = "#ff4444";
-            messageDiv.innerText = "Error de conexión.";
+            messageDiv.innerText = "Connection error.";
         }
     });
 </script>
