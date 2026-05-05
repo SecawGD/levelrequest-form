@@ -13,6 +13,7 @@
             --text-main: #e0e6e2;
             --text-muted: #8e9b92;
             --accent-green: #a0d175;
+            --warning-red: #ff6b6b;
             
             /* Tally Option Active Colors */
             --active-bg: #162a36;
@@ -21,10 +22,12 @@
             
             /* Tags Colors */
             --tag-pink: #fce4ec; --tag-pink-text: #c2185b;
+            --tag-orange: #fff3e0; --tag-orange-text: #e65100;
             --tag-yellow: #fff8e1; --tag-yellow-text: #f57f17;
-            --tag-red: #ffebee; --tag-red-text: #d32f2f;
+            --tag-green: #e8f5e9; --tag-green-text: #2e7d32;
             --tag-blue: #e3f2fd; --tag-blue-text: #1976d2;
             --tag-purple: #f3e5f5; --tag-purple-text: #7b1fa2;
+            --tag-red: #ffebee; --tag-red-text: #d32f2f;
             --tag-grey: #f5f5f5; --tag-grey-text: #616161;
         }
 
@@ -80,8 +83,20 @@
             margin-top: -0.2rem;
         }
 
+        /* Warning Callout */
+        .warning-callout {
+            background-color: rgba(255, 107, 107, 0.1);
+            border-left: 4px solid var(--warning-red);
+            padding: 1rem;
+            color: var(--warning-red);
+            font-weight: 500;
+            margin-bottom: 2.5rem;
+            border-radius: 4px;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
         /* Text Inputs */
-        input[type="text"], input[type="number"], input[type="url"], textarea {
+        input[type="text"], input[type="number"], input[type="url"], input[type="password"], textarea {
             width: 100%;
             padding: 0.8rem 1rem;
             background-color: var(--bg-input);
@@ -97,6 +112,44 @@
             outline: none;
             border-color: var(--text-muted);
             background-color: #1e2821;
+        }
+
+        /* Password Wrapper for the Eye Icon */
+        .password-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .password-wrapper input {
+            padding-right: 2.8rem; /* Espacio para que el texto no choque con el icono */
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 0.8rem;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s;
+        }
+
+        .toggle-password:focus {
+            outline: none;
+        }
+
+        .toggle-password:hover {
+            color: var(--text-main);
+        }
+
+        .eye-icon {
+            width: 20px;
+            height: 20px;
         }
 
         textarea { resize: vertical; min-height: 80px; }
@@ -135,7 +188,6 @@
             text-align: center;
         }
 
-        /* Active state for Options */
         .tally-option.active {
             background-color: var(--active-bg);
             border-color: var(--active-border);
@@ -159,23 +211,44 @@
 
         .tag-pill {
             cursor: pointer;
-            padding: 0.3rem 0.6rem;
-            border-radius: 12px;
+            padding: 0.4rem 0.7rem;
+            border-radius: 6px;
             font-size: 0.85rem;
-            font-weight: 600;
+            font-weight: 500;
             display: flex;
             align-items: center;
+            gap: 0.4rem;
             transition: opacity 0.2s;
         }
+        
         .tag-pill input { display: none; }
+        
+        /* The checkmark icon inside the tag (Space reserved, invisible by default) */
+        .tag-pill::before {
+            content: '✓';
+            font-size: 0.8rem;
+            display: inline-block;
+            width: 0.8rem;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        
+        .tag-pill.active::before {
+            opacity: 1;
+        }
+        
         .tag-pill:hover { opacity: 0.8; }
         .tag-pill:not(.active) { background-color: var(--bg-main) !important; color: var(--text-muted) !important; border: 1px solid var(--border-color); }
+        .tag-pill.active { border: 1px solid transparent; }
 
         .c-pink { background-color: var(--tag-pink); color: var(--tag-pink-text); }
+        .c-orange { background-color: var(--tag-orange); color: var(--tag-orange-text); }
         .c-yellow { background-color: var(--tag-yellow); color: var(--tag-yellow-text); }
-        .c-red { background-color: var(--tag-red); color: var(--tag-red-text); }
+        .c-green { background-color: var(--tag-green); color: var(--tag-green-text); }
         .c-blue { background-color: var(--tag-blue); color: var(--tag-blue-text); }
         .c-purple { background-color: var(--tag-purple); color: var(--tag-purple-text); }
+        .c-red { background-color: var(--tag-red); color: var(--tag-red-text); }
         .c-grey { background-color: var(--tag-grey); color: var(--tag-grey-text); }
 
         /* Stars Rating */
@@ -194,6 +267,11 @@
         .divider { height: 1px; background-color: var(--border-color); margin: 3rem 0 2rem 0; }
 
         /* Submit Button */
+        .submit-container {
+            display: flex;
+            flex-direction: column;
+        }
+
         .submit-btn {
             background-color: #000;
             color: var(--accent-green);
@@ -207,6 +285,7 @@
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
+            width: max-content;
         }
         .submit-btn:hover { opacity: 0.8; }
 
@@ -231,12 +310,22 @@
     <h1>Level Request</h1>
     <form id="levelForm">
 
-        <!-- Access Code (Added for security system) -->
+        <!-- Access Code -->
         <div class="question-group">
             <div class="question-title">Access Code <span class="req">*</span></div>
-            <div class="sub-text">Your private identity code for this community.</div>
-            <input type="text" id="codigo" required placeholder="e.g. 8472">
+            <div class="sub-text">Your private identity code. If you have problems or if you want to change it, you can contact me.</div>
+            <div class="password-wrapper">
+                <input type="password" id="codigo" required>
+                <button type="button" class="toggle-password" id="togglePassword" aria-label="Toggle password visibility">
+                    <!-- Icono de ojo abierto por defecto -->
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-icon"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                </button>
+            </div>
         </div>
+
+        <div class="divider"></div>
+
+        <h2 style="margin-bottom: 2.5rem;">Level Info</h2>
 
         <!-- Level ID -->
         <div class="question-group">
@@ -254,6 +343,15 @@
             </div>
         </div>
 
+        <!-- Conditional: Review Scope -->
+        <div class="question-group hidden" id="group-review-scope">
+            <div class="question-title">Then, do you want me to review all the level or just your part? <span class="req">*</span></div>
+            <div class="options-list radio-group">
+                <label class="tally-option"><input type="radio" name="reviewScope" value="All"><span class="letter">A</span> Yes, I want all the level to be reviewed</label>
+                <label class="tally-option"><input type="radio" name="reviewScope" value="Part"><span class="letter">B</span> No, I only want my part to be reviewed</label>
+            </div>
+        </div>
+
         <!-- Conditional: Parts -->
         <div class="question-group hidden" id="group-parts">
             <div class="question-title">Please, tell me what parts of the level are yours</div>
@@ -262,12 +360,16 @@
 
         <!-- Conditional: Permission -->
         <div class="question-group hidden" id="group-permission">
-            <div class="question-title">Do you have the permission of the creator(s) of the level?</div>
-            <div class="sub-text">I can't give feedback if the creator didn't approve it.</div>
+            <div class="question-title">Do you have the permission of the creator(s) of the level? <span class="req">*</span></div>
             <div class="options-list radio-group">
                 <label class="tally-option"><input type="radio" name="permission" value="Yes"><span class="letter">A</span> Yes</label>
                 <label class="tally-option"><input type="radio" name="permission" value="No"><span class="letter">B</span> No</label>
             </div>
+        </div>
+
+        <!-- Warning Callout -->
+        <div class="warning-callout hidden" id="warning-permission">
+            I can't give feedback if the creator don't approve it.
         </div>
 
         <!-- Difficulty -->
@@ -288,10 +390,10 @@
             </div>
         </div>
 
-        <!-- Conditional: Video -->
-        <div class="question-group hidden" id="group-video">
-            <div class="question-title">Video of your level</div>
-            <div class="sub-text">Only necessary if it's a demon level</div>
+        <!-- Video -->
+        <div class="question-group" id="group-video">
+            <div class="question-title">Video of your level <span class="req hidden" id="video-req">*</span></div>
+            <div class="sub-text">Optional if it's not a Demon</div>
             <input type="url" id="video" placeholder="https://www.youtube.com...">
         </div>
 
@@ -299,12 +401,28 @@
         <div class="question-group">
             <div class="question-title">Describe your level with one or more tags <span class="req">*</span></div>
             <div class="tags-container">
+                <label class="tag-pill c-red"><input type="checkbox" name="tags" value="Layout"> Layout</label>
+                <label class="tag-pill c-orange"><input type="checkbox" name="tags" value="Rate worthy"> Rate worthy</label>
+                <label class="tag-pill c-yellow"><input type="checkbox" name="tags" value="Experimental"> Experimental</label>
+                <label class="tag-pill c-green"><input type="checkbox" name="tags" value="Glow"> Glow</label>
+                <label class="tag-pill c-blue"><input type="checkbox" name="tags" value="Modern"> Modern</label>
+                <label class="tag-pill c-purple"><input type="checkbox" name="tags" value="Minimalist"> Minimalist</label>
                 <label class="tag-pill c-pink"><input type="checkbox" name="tags" value="Lyrics"> Lyrics</label>
-                <label class="tag-pill c-yellow"><input type="checkbox" name="tags" value="Visual FX"> Visual FX</label>
+                <label class="tag-pill c-grey"><input type="checkbox" name="tags" value="Travel"> Travel</label>
                 <label class="tag-pill c-red"><input type="checkbox" name="tags" value="Fast"> Fast</label>
+                <label class="tag-pill c-orange"><input type="checkbox" name="tags" value="Slow"> Slow</label>
+                <label class="tag-pill c-yellow"><input type="checkbox" name="tags" value="Visual FX"> Visual FX</label>
+                <label class="tag-pill c-green"><input type="checkbox" name="tags" value="Funky"> Funky</label>
                 <label class="tag-pill c-blue"><input type="checkbox" name="tags" value="Fun"> Fun</label>
-                <label class="tag-pill c-purple"><input type="checkbox" name="tags" value="Abstract"> Abstract</label>
-                <label class="tag-pill c-grey"><input type="checkbox" name="tags" value="Other"> Other</label>
+                <label class="tag-pill c-purple"><input type="checkbox" name="tags" value="Terror"> Terror</label>
+                <label class="tag-pill c-pink"><input type="checkbox" name="tags" value="Chill"> Chill</label>
+                <label class="tag-pill c-grey"><input type="checkbox" name="tags" value="Classic"> Classic</label>
+                <label class="tag-pill c-red"><input type="checkbox" name="tags" value="Abstract"> Abstract</label>
+                <label class="tag-pill c-orange"><input type="checkbox" name="tags" value="Retro"> Retro</label>
+                <label class="tag-pill c-yellow"><input type="checkbox" name="tags" value="Challenge"> Challenge</label>
+                <label class="tag-pill c-green"><input type="checkbox" name="tags" value="Futuristic"> Futuristic</label>
+                <label class="tag-pill c-blue"><input type="checkbox" name="tags" value="Space"> Space</label>
+                <label class="tag-pill c-purple"><input type="checkbox" name="tags" value="Other"> Other</label>
             </div>
             <input type="text" id="otherTagInput" class="hidden" style="margin-top: 0.8rem;" placeholder="Type your other tag...">
         </div>
@@ -334,10 +452,10 @@
         </div>
 
         <!-- Preview -->
-        <div class="question-group">
+        <div class="question-group" id="group-preview">
             <div class="question-title">Is your level a Preview? <span class="req">*</span></div>
             <div class="options-list radio-group">
-                <label class="tally-option"><input type="radio" name="preview" value="Yes" required><span class="letter">A</span> Yes, my level is a preview (an incompleted level)</label>
+                <label class="tally-option"><input type="radio" name="preview" value="Yes"><span class="letter">A</span> Yes, my level is a preview (an incompleted level)</label>
                 <label class="tally-option"><input type="radio" name="preview" value="No"><span class="letter">B</span> No, my level is not a preview</label>
             </div>
         </div>
@@ -367,16 +485,33 @@
             </div>
         </div>
 
-        <button type="submit" class="submit-btn">Submit ➔</button>
+        <div class="submit-container">
+            <button type="submit" class="submit-btn" id="submitBtn">Submit ➔</button>
+            <div id="message" class="hidden"></div>
+        </div>
     </form>
-    
-    <div id="message" class="hidden"></div>
 </div>
 
 <script>
     // --- UI LOGIC (Tally Styling) ---
     
-    // Custom Radio Buttons
+    // Toggle Password Visibility Logic
+    const togglePassword = document.getElementById('togglePassword');
+    const codigoInput = document.getElementById('codigo');
+
+    togglePassword.addEventListener('click', () => {
+        const type = codigoInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        codigoInput.setAttribute('type', type);
+        
+        if (type === 'text') {
+            // Icono de ojo tachado (ocultar)
+            togglePassword.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-icon"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>';
+        } else {
+            // Icono de ojo normal (mostrar)
+            togglePassword.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-icon"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
+        }
+    });
+
     document.querySelectorAll('.radio-group').forEach(group => {
         const options = group.querySelectorAll('.tally-option');
         options.forEach(opt => {
@@ -388,7 +523,6 @@
         });
     });
 
-    // Custom Tag Pills (Checkboxes)
     const tagPills = document.querySelectorAll('.tag-pill');
     tagPills.forEach(pill => {
         const input = pill.querySelector('input');
@@ -397,7 +531,6 @@
         });
     });
 
-    // 10-Star Rating Logic
     const stars = document.querySelectorAll('.star');
     const starsInput = document.getElementById('starsValue');
     stars.forEach(star => {
@@ -410,44 +543,103 @@
         });
     });
 
-    // --- CONDITIONAL LOGIC ---
-
-    // Ownership logic
-    document.querySelectorAll('input[name="ownership"]').forEach(radio => {
-        radio.addEventListener('change', (e) => {
-            document.getElementById('group-parts').classList.toggle('hidden', e.target.value !== 'Partially');
-            document.getElementById('group-permission').classList.toggle('hidden', e.target.value !== 'No');
+    // --- TALLY CONDITIONAL LOGIC ENGINE ---
+    
+    const state = {};
+    const formInputs = document.querySelectorAll('input[type="radio"], input[type="checkbox"]');
+    
+    function updateConditions() {
+        formInputs.forEach(input => {
+            if (input.type === 'radio' && input.checked) {
+                state[input.name] = input.value;
+            }
         });
+
+        // Ownership
+        const groupReviewScope = document.getElementById('group-review-scope');
+        const reviewScopeInputs = document.querySelectorAll('input[name="reviewScope"]');
+        if (state.ownership === 'Partially') {
+            groupReviewScope.classList.remove('hidden');
+            reviewScopeInputs.forEach(el => el.required = true);
+        } else {
+            groupReviewScope.classList.add('hidden');
+            reviewScopeInputs.forEach(el => el.required = false);
+        }
+
+        // Parts
+        const groupParts = document.getElementById('group-parts');
+        if (state.ownership === 'Partially' && state.reviewScope === 'Part') {
+            groupParts.classList.remove('hidden');
+        } else {
+            groupParts.classList.add('hidden');
+        }
+
+        // Permission
+        const groupPermission = document.getElementById('group-permission');
+        const permInputs = document.querySelectorAll('input[name="permission"]');
+        if (state.ownership === 'No' || (state.ownership === 'Partially' && state.reviewScope === 'All')) {
+            groupPermission.classList.remove('hidden');
+            permInputs.forEach(el => el.required = true);
+        } else {
+            groupPermission.classList.add('hidden');
+            permInputs.forEach(el => el.required = false);
+        }
+
+        const warningPerm = document.getElementById('warning-permission');
+        const submitBtn = document.getElementById('submitBtn');
+        if (!groupPermission.classList.contains('hidden') && state.permission === 'No') {
+            warningPerm.classList.remove('hidden');
+            submitBtn.style.display = 'none';
+        } else {
+            warningPerm.classList.add('hidden');
+            submitBtn.style.display = 'inline-flex';
+        }
+
+        // Difficulty -> Video
+        const videoInput = document.getElementById('video');
+        const videoReq = document.getElementById('video-req');
+        if (state.difficulty && state.difficulty.includes('Demon')) {
+            videoInput.required = true;
+            videoReq.classList.remove('hidden');
+        } else {
+            videoInput.required = false;
+            videoReq.classList.add('hidden');
+        }
+
+        // Rated -> Stars/Preview
+        const groupStars = document.getElementById('group-stars');
+        const groupPreview = document.getElementById('group-preview');
+        const previewInputs = document.querySelectorAll('input[name="preview"]');
+        
+        if (state.rated === 'Yes') {
+            groupStars.classList.remove('hidden');
+            groupPreview.classList.add('hidden');
+            previewInputs.forEach(el => el.required = false);
+        } else {
+            groupStars.classList.add('hidden');
+            groupPreview.classList.remove('hidden');
+            previewInputs.forEach(el => el.required = true);
+        }
+
+        // Comments
+        const groupComments = document.getElementById('group-comments');
+        if (state.commentsCheck === 'Yes') {
+            groupComments.classList.remove('hidden');
+        } else {
+            groupComments.classList.add('hidden');
+        }
+    }
+
+    formInputs.forEach(input => {
+        input.addEventListener('change', updateConditions);
     });
 
-    // Difficulty (Demon = Video) logic
-    document.querySelectorAll('input[name="difficulty"]').forEach(radio => {
-        radio.addEventListener('change', (e) => {
-            const isDemon = e.target.value.includes('Demon');
-            document.getElementById('group-video').classList.toggle('hidden', !isDemon);
-        });
-    });
-
-    // Tags (Other = Text Input)
+    // Special logic for the "Other" tag
     document.querySelectorAll('input[name="tags"]').forEach(chk => {
         chk.addEventListener('change', (e) => {
             if (e.target.value === 'Other') {
                 document.getElementById('otherTagInput').classList.toggle('hidden', !e.target.checked);
             }
-        });
-    });
-
-    // Rated (Yes = Stars) logic
-    document.querySelectorAll('input[name="rated"]').forEach(radio => {
-        radio.addEventListener('change', (e) => {
-            document.getElementById('group-stars').classList.toggle('hidden', e.target.value !== 'Yes');
-        });
-    });
-
-    // Say something else logic
-    document.querySelectorAll('input[name="commentsCheck"]').forEach(radio => {
-        radio.addEventListener('change', (e) => {
-            document.getElementById('group-comments').classList.toggle('hidden', e.target.value !== 'Yes');
         });
     });
 
@@ -459,7 +651,6 @@
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         
-        // Tags validation
         let selectedTags = Array.from(document.querySelectorAll('input[name="tags"]:checked')).map(cb => cb.value);
         if (selectedTags.length === 0) {
             alert("Please select at least one tag.");
@@ -470,8 +661,7 @@
             if(otherVal) selectedTags.push(`Other: ${otherVal}`);
         }
 
-        // Stars validation if rated is Yes
-        if (document.querySelector('input[name="rated"]:checked')?.value === 'Yes' && starsInput.value === "0") {
+        if (state.rated === 'Yes' && starsInput.value === "0") {
             alert("Please select a star rating.");
             return;
         }
@@ -481,21 +671,24 @@
         messageDiv.style.color = "var(--text-main)";
         messageDiv.style.borderColor = "var(--border-color)";
 
-        // Payload
+        const isPermHidden = document.getElementById('group-permission').classList.contains('hidden');
+        const isPartsHidden = document.getElementById('group-parts').classList.contains('hidden');
+        const isPreviewHidden = document.getElementById('group-preview').classList.contains('hidden');
+
         const payload = {
             codigo: document.getElementById('codigo').value,
             levelID: document.getElementById('levelID').value,
-            ownership: document.querySelector('input[name="ownership"]:checked')?.value,
-            parts: document.getElementById('parts').value || 'N/A',
-            permission: document.querySelector('input[name="permission"]:checked')?.value || 'N/A',
-            difficulty: document.querySelector('input[name="difficulty"]:checked')?.value,
+            ownership: state.ownership,
+            parts: isPartsHidden ? 'N/A' : (document.getElementById('parts').value || 'N/A'),
+            permission: isPermHidden ? 'N/A' : (state.permission || 'N/A'),
+            difficulty: state.difficulty,
             video: document.getElementById('video').value || 'N/A',
             tags: selectedTags.join(', '),
-            rated: document.querySelector('input[name="rated"]:checked')?.value,
-            stars: document.querySelector('input[name="rated"]:checked')?.value === 'Yes' ? starsInput.value : 'N/A',
-            preview: document.querySelector('input[name="preview"]:checked')?.value,
-            comments: document.getElementById('comments').value || 'N/A',
-            feedback: document.querySelector('input[name="feedback"]:checked')?.value
+            rated: state.rated,
+            stars: state.rated === 'Yes' ? starsInput.value : 'N/A',
+            preview: isPreviewHidden ? 'N/A' : state.preview,
+            comments: state.commentsCheck === 'Yes' ? document.getElementById('comments').value : 'N/A',
+            feedback: state.feedback
         };
 
         try {
@@ -510,14 +703,20 @@
                 messageDiv.style.borderColor = "var(--accent-green)";
                 messageDiv.innerHTML = "✅ " + result.message;
                 
-                // Reset form visuals
                 form.reset();
                 document.querySelectorAll('.tally-option').forEach(o => o.classList.remove('active'));
                 document.querySelectorAll('.tag-pill').forEach(p => p.classList.remove('active'));
                 document.querySelectorAll('.star').forEach(s => s.classList.remove('active'));
                 starsInput.value = "0";
-                document.querySelectorAll('.hidden:not(#message, #otherTagInput)').forEach(el => el.classList.add('hidden'));
+                
+                for (let key in state) delete state[key];
+                updateConditions();
+                
                 document.getElementById('otherTagInput').classList.add('hidden');
+
+                // Asegurar que el icono de ojo regrese a su estado cerrado al limpiar
+                codigoInput.setAttribute('type', 'password');
+                togglePassword.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-icon"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
 
             } else {
                 messageDiv.style.color = "#ff4d4d";
@@ -530,9 +729,12 @@
             messageDiv.innerHTML = "❌ Connection error.";
         }
     });
+    
+    updateConditions();
 </script>
 
 </body>
 </html>
+
 
 ```
