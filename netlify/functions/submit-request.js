@@ -34,20 +34,40 @@ exports.handler = async (event) => {
         // 2. LÓGICA DE 7 DÍAS
         const nivelesRows = await sheetNiveles.getRows();
         const now = new Date();
+        
+        // Creamos una fecha amigable (YYYY-MM-DD HH:mm:ss) para la base de datos
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        const friendlyDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+
         const userRow = nivelesRows.reverse().find(row => row.get('codigo') === codigo);
 
         if (userRow) {
-            const lastDate = new Date(userRow.get('fecha'));
-            const diffDays = (now - lastDate) / (1000 * 60 * 60 * 24);
-            if (diffDays < 7) {
-                const faltan = Math.ceil(7 - diffDays);
-                return { statusCode: 403, body: JSON.stringify({ error: `Hi ${nombreReal}, you must wait ${faltan} more days to send another level.` }) };
+            // Obtenemos la última fecha registrada por este usuario
+            const lastDateStr = userRow.get('fecha');
+            
+            // Reemplazamos el espacio por una 'T' para asegurar que Javascript pueda parsear
+            // correctamente tanto las fechas viejas (ISO) como las nuevas (Friendly)
+            const parsedDateStr = lastDateStr.includes('T') ? lastDateStr : lastDateStr.replace(' ', 'T');
+            const lastDate = new Date(parsedDateStr);
+            
+            // Si la fecha es válida, procedemos a calcular la diferencia
+            if (!isNaN(lastDate)) {
+                const diffDays = (now - lastDate) / (1000 * 60 * 60 * 24);
+                if (diffDays < 7) {
+                    const faltan = Math.ceil(7 - diffDays);
+                    return { statusCode: 403, body: JSON.stringify({ error: `Hi ${nombreReal}, you must wait ${faltan} more days to send another level.` }) };
+                }
             }
         }
 
         // 3. GUARDAR TODOS LOS DATOS
         await sheetNiveles.addRow({
-            fecha: now.toISOString(),
+            fecha: friendlyDate,
             codigo: codigo,
             levelID: levelID,
             ownership: ownership || '',
