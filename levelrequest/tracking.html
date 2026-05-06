@@ -1,92 +1,362 @@
-const { GoogleSpreadsheet } = require('google-spreadsheet');
-const { JWT } = require('google-auth-library');
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Track Level Status</title>
+    <style>
+        :root {
+            --bg-main: #131b16;
+            --bg-input: #1a231d;
+            --border-color: #2c3b31;
+            --text-main: #e0e6e2;
+            --text-muted: #8e9b92;
+            --accent-green: #a0d175;
+        }
 
-exports.handler = async (event) => {
-    if (event.httpMethod !== "POST") return { statusCode: 405, body: "Method Not Allowed" };
+        * {
+            box-sizing: border-box;
+        }
 
-    // Extraemos todos los datos nuevos del formulario
-    const data = JSON.parse(event.body);
-    const { codigo, levelID, ownership, parts, permission, difficulty, video, tags, rated, stars, preview, comments, feedback } = data;
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            margin: 0;
+            padding: 3rem 1.5rem;
+            display: flex;
+            justify-content: center;
+            line-height: 1.5;
+        }
 
-    const serviceAccountAuth = new JWT({
-        email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-        key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\\\n/g, '\\n'),
-        scopes: ['<https://www.googleapis.com/auth/spreadsheets>'],
+        .container {
+            width: 100%;
+            max-width: 500px;
+        }
+
+        h1 {
+            color: var(--accent-green);
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+        
+        .subtitle {
+            color: var(--text-muted);
+            margin-bottom: 2.5rem;
+            font-size: 0.95rem;
+        }
+
+        .password-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        input[type="password"], input[type="text"] {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            padding-right: 2.8rem;
+            background-color: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-main);
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--text-muted);
+            background-color: #1e2821;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 0.8rem;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s;
+        }
+
+        .toggle-password:hover {
+            color: var(--text-main);
+        }
+
+        .eye-icon {
+            width: 20px;
+            height: 20px;
+        }
+
+        .btn {
+            background-color: #000;
+            color: var(--accent-green);
+            border: none;
+            padding: 0.8rem 1.5rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: opacity 0.3s;
+            width: 100%;
+        }
+
+        .btn:hover {
+            opacity: 0.8;
+        }
+        
+        .back-link {
+            display: inline-block;
+            margin-top: 1.5rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: var(--text-main);
+        }
+
+        #message {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        /* --- Timeline Progress CSS --- */
+        .tracking-result {
+            margin-top: 3rem;
+            padding: 2rem 1.5rem;
+            background-color: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .level-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .timeline {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        /* La línea de fondo que conecta los puntos */
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 14px; /* Centro de los círculos */
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            background: var(--border-color);
+            z-index: 1;
+        }
+
+        .step {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .circle {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--bg-input);
+            border: 2px solid var(--border-color);
+            margin-bottom: 0.8rem;
+            transition: all 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: transparent;
+        }
+
+        .label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Estados del paso */
+        .step.completed .circle {
+            background: var(--accent-green);
+            border-color: var(--accent-green);
+            color: #131b16; /* Dark checkmark */
+        }
+
+        .step.completed .label {
+            color: var(--text-main);
+        }
+
+        .step.current .circle {
+            background: var(--bg-input);
+            border-color: var(--accent-green);
+            box-shadow: 0 0 0 4px rgba(160, 209, 117, 0.2); /* Resplandor */
+        }
+
+        .step.current .circle::after {
+            content: '•';
+            color: var(--accent-green);
+            font-size: 1.2rem;
+            line-height: 1;
+        }
+
+        .step.current .label {
+            color: var(--accent-green);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Track Status</h1>
+    <div class="subtitle">Enter your Access Code to see the progress of your latest requested level.</div>
+    
+    <form id="trackForm">
+        <div class="password-wrapper">
+            <input type="password" id="codigo" required placeholder="Access Code">
+            <button type="button" class="toggle-password" id="togglePassword" aria-label="Toggle password visibility">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-icon"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            </button>
+        </div>
+        <button type="submit" class="btn">Track Level ➔</button>
+    </form>
+
+    <div id="message"></div>
+
+    <div id="resultContainer" class="tracking-result hidden">
+        <div class="level-header">Level ID: <span id="displayLevelID" style="color: var(--accent-green);"></span></div>
+        
+        <div class="timeline" id="timeline">
+            <div class="step" data-status="Pendiente">
+                <div class="circle">✓</div>
+                <div class="label">Pending</div>
+            </div>
+            <div class="step" data-status="Visto">
+                <div class="circle">✓</div>
+                <div class="label">Seen</div>
+            </div>
+            <div class="step" data-status="Revisandolo">
+                <div class="circle">✓</div>
+                <div class="label">Reviewing</div>
+            </div>
+            <div class="step" data-status="Finalizado">
+                <div class="circle">✓</div>
+                <div class="label">Finished</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- CORRECCIÓN AQUÍ: Ruta relativa para regresar -->
+    <a href="index.html" class="back-link">← Back to Request Form</a>
+</div>
+
+<script>
+    const togglePassword = document.getElementById('togglePassword');
+    const codigoInput = document.getElementById('codigo');
+
+    togglePassword.addEventListener('click', () => {
+        const type = codigoInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        codigoInput.setAttribute('type', type);
+        
+        if (type === 'text') {
+            togglePassword.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-icon"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>';
+        } else {
+            togglePassword.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-icon"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
+        }
     });
 
-    const doc = new GoogleSpreadsheet(process.env.GOOGLE_SHEET_ID, serviceAccountAuth);
+    const form = document.getElementById('trackForm');
+    const messageDiv = document.getElementById('message');
+    const resultContainer = document.getElementById('resultContainer');
+    const displayLevelID = document.getElementById('displayLevelID');
+    
+    const statusOrder = ['Pendiente', 'Visto', 'Revisandolo', 'Finalizado'];
 
-    try {
-        await doc.loadInfo();
-        const sheetNiveles = doc.sheetsByIndex[0];
-        const sheetUsuarios = doc.sheetsByIndex[1];
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        messageDiv.style.color = "var(--text-muted)";
+        messageDiv.innerHTML = "Searching...";
+        resultContainer.classList.add('hidden');
 
-        // 1. VERIFICACIÓN DE IDENTIDAD
-        const usuariosRows = await sheetUsuarios.getRows();
-        const validUser = usuariosRows.find(row => row.get('codigo') === codigo);
+        const codigo = codigoInput.value;
 
-        if (!validUser) {
-            return { statusCode: 403, body: JSON.stringify({ error: "Invalid access code." }) };
-        }
+        try {
+            const response = await fetch('/.netlify/functions/track-status', {
+                method: 'POST',
+                body: JSON.stringify({ codigo })
+            });
+            const result = await response.json();
+            
+            if (response.ok) {
+                messageDiv.innerHTML = "";
+                displayLevelID.textContent = result.levelID;
+                resultContainer.classList.remove('hidden');
 
-        const nombreReal = validUser.get('nombre');
-
-        // 2. LÓGICA DE 7 DÍAS
-        const nivelesRows = await sheetNiveles.getRows();
-        const now = new Date();
-
-        // Creamos una fecha amigable (YYYY-MM-DD HH:mm:ss) para la base de datos
-        const year = now.getFullYear();
-        const month = String(now.getMonth() + 1).padStart(2, '0');
-        const day = String(now.getDate()).padStart(2, '0');
-        const hours = String(now.getHours()).padStart(2, '0');
-        const minutes = String(now.getMinutes()).padStart(2, '0');
-        const seconds = String(now.getSeconds()).padStart(2, '0');
-        const friendlyDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-
-        const userRow = nivelesRows.reverse().find(row => row.get('codigo') === codigo);
-
-        if (userRow) {
-            // Obtenemos la última fecha registrada por este usuario
-            const lastDateStr = userRow.get('fecha');
-
-            if (lastDateStr) {
-                // Reemplazamos el espacio por una 'T' para parsear de forma segura
-                const parsedDateStr = lastDateStr.includes('T') ? lastDateStr : lastDateStr.replace(' ', 'T');
-                const lastDate = new Date(parsedDateStr);
-
-                // Si la fecha es válida, procedemos a calcular la diferencia
-                if (!isNaN(lastDate)) {
-                    const diffDays = (now - lastDate) / (1000 * 60 * 60 * 24);
-                    if (diffDays < 7) {
-                        const faltan = Math.ceil(7 - diffDays);
-                        return { statusCode: 403, body: JSON.stringify({ error: `Hi ${nombreReal}, you must wait ${faltan} more days to send another level.` }) };
+                const currentStatus = result.estado;
+                const statusIndex = statusOrder.indexOf(currentStatus) !== -1 ? statusOrder.indexOf(currentStatus) : 0; 
+                
+                const steps = document.querySelectorAll('.step');
+                steps.forEach((step, index) => {
+                    step.classList.remove('completed', 'current');
+                    if (index < statusIndex) {
+                        step.classList.add('completed');
+                    } else if (index === statusIndex) {
+                        if (currentStatus === 'Finalizado') {
+                            step.classList.add('completed');
+                        } else {
+                            step.classList.add('current');
+                        }
                     }
-                }
+                });
+
+            } else {
+                messageDiv.style.color = "#ff4d4d";
+                messageDiv.innerHTML = "❌ " + (result.error || "Not found.");
             }
+        } catch (err) {
+            messageDiv.style.color = "#ff4d4d";
+            messageDiv.innerHTML = "❌ Connection error.";
         }
+    });
+</script>
 
-        // 3. GUARDAR TODOS LOS DATOS (Con el estado por defecto)
-        await sheetNiveles.addRow({
-            estado: 'Pendiente',
-            fecha: friendlyDate,
-            codigo: codigo,
-            levelID: levelID,
-            ownership: ownership || '',
-            parts: parts || '',
-            permission: permission || '',
-            difficulty: difficulty || '',
-            video: video || '',
-            tags: tags || '',
-            rated: rated || '',
-            stars: stars || '',
-            preview: preview || '',
-            comments: comments || '',
-            feedback: feedback || ''
-        });
+</body>
+</html>
 
-        return { statusCode: 200, body: JSON.stringify({ message: `Success, ${nombreReal}! Level submitted.` }) };
-    } catch (err) {
-        return { statusCode: 500, body: JSON.stringify({ error: err.message }) };
-    }
-};
+
+```
