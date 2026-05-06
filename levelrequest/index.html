@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -30,7 +31,9 @@
             --tag-grey: #f5f5f5; --tag-grey-text: #616161;
         }
 
-        * { box-sizing: border-box; }
+        * {
+            box-sizing: border-box;
+        }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -73,7 +76,10 @@
             margin-bottom: 0.5rem;
         }
         
-        .req { color: var(--text-muted); font-weight: normal; }
+        .req {
+            color: var(--text-muted);
+            font-weight: normal;
+        }
 
         .sub-text {
             color: var(--text-muted);
@@ -121,7 +127,7 @@
         }
 
         .password-wrapper input {
-            padding-right: 2.8rem; /* Espacio para que el texto no choque con el icono */
+            padding-right: 2.8rem;
         }
 
         .toggle-password {
@@ -151,7 +157,10 @@
             height: 20px;
         }
 
-        textarea { resize: vertical; min-height: 80px; }
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
 
         /* Tally Radio/Checkbox Options */
         .options-list {
@@ -173,7 +182,9 @@
             user-select: none;
         }
 
-        .tally-option input { display: none; }
+        .tally-option input {
+            display: none;
+        }
 
         .tally-option .letter {
             background-color: var(--border-color);
@@ -220,7 +231,9 @@
             transition: opacity 0.2s;
         }
         
-        .tag-pill input { display: none; }
+        .tag-pill input {
+            display: none;
+        }
         
         /* The checkmark icon inside the tag (Space reserved, invisible by default) */
         .tag-pill::before {
@@ -237,9 +250,19 @@
             opacity: 1;
         }
         
-        .tag-pill:hover { opacity: 0.8; }
-        .tag-pill:not(.active) { background-color: var(--bg-main) !important; color: var(--text-muted) !important; border: 1px solid var(--border-color); }
-        .tag-pill.active { border: 1px solid transparent; }
+        .tag-pill:hover {
+            opacity: 0.8;
+        }
+
+        .tag-pill:not(.active) {
+            background-color: var(--bg-main) !important;
+            color: var(--text-muted) !important;
+            border: 1px solid var(--border-color);
+        }
+
+        .tag-pill.active {
+            border: 1px solid transparent;
+        }
 
         .c-pink { background-color: var(--tag-pink); color: var(--tag-pink-text); }
         .c-orange { background-color: var(--tag-orange); color: var(--tag-orange-text); }
@@ -258,12 +281,25 @@
             cursor: pointer;
             color: var(--border-color);
         }
-        .star { transition: color 0.2s; }
-        .star:hover, .star.active { color: #facc15; }
+
+        .star {
+            transition: color 0.2s;
+        }
+
+        .star:hover, .star.active {
+            color: #facc15;
+        }
 
         /* Utilities */
-        .hidden { display: none !important; }
-        .divider { height: 1px; background-color: var(--border-color); margin: 3rem 0 2rem 0; }
+        .hidden {
+            display: none !important;
+        }
+
+        .divider {
+            height: 1px;
+            background-color: var(--border-color);
+            margin: 3rem 0 2rem 0;
+        }
 
         /* Submit Button */
         .submit-container {
@@ -286,7 +322,10 @@
             gap: 0.5rem;
             width: max-content;
         }
-        .submit-btn:hover { opacity: 0.8; }
+
+        .submit-btn:hover {
+            opacity: 0.8;
+        }
 
         #message {
             margin-top: 1.5rem;
@@ -319,6 +358,10 @@
                     <!-- Icono de ojo abierto por defecto -->
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-icon"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                 </button>
+            </div>
+            <!-- Botón rastreador añadido -->
+            <div style="margin-top: 0.8rem; font-size: 0.85rem;">
+                <a href="/tracking.html" style="color: var(--accent-green); text-decoration: none; font-weight: 500; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">➔ Track your latest level status</a>
             </div>
         </div>
 
@@ -734,3 +777,6 @@
 
 </body>
 </html>
+
+
+```
