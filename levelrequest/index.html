@@ -7,7 +7,7 @@
     <title>Level Request</title>
     <style>
         :root {
-            --bg-main: #131b16; /* Tally dark green background */
+            --bg-main: #131b16;
             --bg-input: #1a231d;
             --border-color: #2c3b31;
             --text-main: #e0e6e2;
@@ -15,12 +15,10 @@
             --accent-green: #a0d175;
             --warning-red: #ff6b6b;
             
-            /* Tally Option Active Colors */
             --active-bg: #162a36;
             --active-border: #24496b;
             --active-letter-bg: #285d8c;
             
-            /* Tags Colors */
             --tag-pink: #fce4ec; --tag-pink-text: #c2185b;
             --tag-orange: #fff3e0; --tag-orange-text: #e65100;
             --tag-yellow: #fff8e1; --tag-yellow-text: #f57f17;
@@ -31,9 +29,7 @@
             --tag-grey: #f5f5f5; --tag-grey-text: #616161;
         }
 
-        * {
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -46,223 +42,78 @@
             line-height: 1.5;
         }
 
-        .form-container {
-            width: 100%;
-            max-width: 600px;
-        }
-
-        h1 {
-            color: var(--accent-green);
-            font-size: 2.2rem;
-            margin-bottom: 2.5rem;
-            font-weight: 700;
-        }
-
-        h2 {
-            color: var(--accent-green);
-            font-size: 1.5rem;
-            margin-bottom: 0.2rem;
-            font-weight: 700;
-        }
-
-        .question-group {
-            margin-bottom: 2.5rem;
-            animation: fadeIn 0.3s ease-in-out;
-        }
-
-        .question-title {
-            font-weight: 600;
-            font-size: 1rem;
-            margin-bottom: 0.5rem;
-        }
+        .form-container { width: 100%; max-width: 600px; }
+        h1 { color: var(--accent-green); font-size: 2.2rem; margin-bottom: 2.5rem; font-weight: 700; }
+        h2 { color: var(--accent-green); font-size: 1.5rem; margin-bottom: 0.2rem; font-weight: 700; }
         
-        .req {
-            color: var(--text-muted);
-            font-weight: normal;
-        }
+        .question-group { margin-bottom: 2.5rem; animation: fadeIn 0.3s ease-in-out; }
+        .question-title { font-weight: 600; font-size: 1rem; margin-bottom: 0.5rem; }
+        .req { color: var(--text-muted); font-weight: normal; }
+        .sub-text { color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem; margin-top: -0.2rem; }
 
-        .sub-text {
-            color: var(--text-muted);
-            font-size: 0.85rem;
-            margin-bottom: 1rem;
-            margin-top: -0.2rem;
-        }
-
-        /* Warning Callout */
         .warning-callout {
             background-color: rgba(255, 107, 107, 0.1);
             border-left: 4px solid var(--warning-red);
-            padding: 1rem;
-            color: var(--warning-red);
-            font-weight: 500;
-            margin-bottom: 2.5rem;
-            border-radius: 4px;
+            padding: 1rem; color: var(--warning-red);
+            font-weight: 500; margin-bottom: 2.5rem; border-radius: 4px;
             animation: fadeIn 0.3s ease-in-out;
         }
 
-        /* Text Inputs */
         input[type="text"], input[type="number"], input[type="url"], input[type="password"], textarea {
-            width: 100%;
-            padding: 0.8rem 1rem;
-            background-color: var(--bg-input);
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            color: var(--text-main);
-            font-size: 0.95rem;
-            font-family: inherit;
+            width: 100%; padding: 0.8rem 1rem;
+            background-color: var(--bg-input); border: 1px solid var(--border-color);
+            border-radius: 6px; color: var(--text-main); font-size: 0.95rem; font-family: inherit;
             transition: all 0.2s;
         }
 
-        input:focus, textarea:focus {
-            outline: none;
-            border-color: var(--text-muted);
-            background-color: #1e2821;
-        }
+        input:focus, textarea:focus { outline: none; border-color: var(--text-muted); background-color: #1e2821; }
 
-        /* Password Wrapper for the Eye Icon */
-        .password-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
-        .password-wrapper input {
-            padding-right: 2.8rem;
-        }
-
+        .password-wrapper { position: relative; display: flex; align-items: center; }
+        .password-wrapper input { padding-right: 2.8rem; }
+        
         .toggle-password {
-            position: absolute;
-            right: 0.8rem;
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            cursor: pointer;
-            padding: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            position: absolute; right: 0.8rem; background: none; border: none; color: var(--text-muted);
+            cursor: pointer; padding: 0; display: flex; align-items: center; justify-content: center;
             transition: color 0.2s;
         }
+        .toggle-password:focus { outline: none; }
+        .toggle-password:hover { color: var(--text-main); }
+        .eye-icon { width: 20px; height: 20px; }
 
-        .toggle-password:focus {
-            outline: none;
-        }
+        textarea { resize: vertical; min-height: 80px; }
 
-        .toggle-password:hover {
-            color: var(--text-main);
-        }
-
-        .eye-icon {
-            width: 20px;
-            height: 20px;
-        }
-
-        textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-
-        /* Tally Radio/Checkbox Options */
-        .options-list {
-            display: flex;
-            flex-direction: column;
-            gap: 0.4rem;
-        }
-
+        .options-list { display: flex; flex-direction: column; gap: 0.4rem; }
         .tally-option {
-            display: flex;
-            align-items: center;
-            padding: 0.6rem 0.8rem;
-            background-color: var(--bg-input);
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 0.95rem;
-            user-select: none;
+            display: flex; align-items: center; padding: 0.6rem 0.8rem;
+            background-color: var(--bg-input); border: 1px solid var(--border-color);
+            border-radius: 6px; cursor: pointer; transition: all 0.2s; font-size: 0.95rem; user-select: none;
         }
-
-        .tally-option input {
-            display: none;
-        }
-
+        .tally-option input { display: none; }
         .tally-option .letter {
-            background-color: var(--border-color);
-            color: var(--text-main);
-            font-size: 0.75rem;
-            font-weight: bold;
-            padding: 0.1rem 0.4rem;
-            border-radius: 4px;
-            margin-right: 0.8rem;
-            min-width: 22px;
-            text-align: center;
+            background-color: var(--border-color); color: var(--text-main); font-size: 0.75rem;
+            font-weight: bold; padding: 0.1rem 0.4rem; border-radius: 4px; margin-right: 0.8rem;
+            min-width: 22px; text-align: center;
         }
+        .tally-option.active { background-color: var(--active-bg); border-color: var(--active-border); }
+        .tally-option.active .letter { background-color: var(--active-letter-bg); color: #fff; }
 
-        .tally-option.active {
-            background-color: var(--active-bg);
-            border-color: var(--active-border);
-        }
-
-        .tally-option.active .letter {
-            background-color: var(--active-letter-bg);
-            color: #fff;
-        }
-
-        /* Tags / Pills */
         .tags-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            background-color: var(--bg-input);
-            border: 1px solid var(--border-color);
-            padding: 0.8rem;
-            border-radius: 6px;
+            display: flex; flex-wrap: wrap; gap: 0.5rem; background-color: var(--bg-input);
+            border: 1px solid var(--border-color); padding: 0.8rem; border-radius: 6px;
         }
-
         .tag-pill {
-            cursor: pointer;
-            padding: 0.4rem 0.7rem;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-            transition: opacity 0.2s;
+            cursor: pointer; padding: 0.4rem 0.7rem; border-radius: 6px; font-size: 0.85rem;
+            font-weight: 500; display: flex; align-items: center; gap: 0.4rem; transition: opacity 0.2s;
         }
-        
-        .tag-pill input {
-            display: none;
-        }
-        
-        /* The checkmark icon inside the tag (Space reserved, invisible by default) */
+        .tag-pill input { display: none; }
         .tag-pill::before {
-            content: '✓';
-            font-size: 0.8rem;
-            display: inline-block;
-            width: 0.8rem;
-            text-align: center;
-            opacity: 0;
-            transition: opacity 0.2s ease;
+            content: '✓'; font-size: 0.8rem; display: inline-block; width: 0.8rem; text-align: center;
+            opacity: 0; transition: opacity 0.2s ease;
         }
-        
-        .tag-pill.active::before {
-            opacity: 1;
-        }
-        
-        .tag-pill:hover {
-            opacity: 0.8;
-        }
-
-        .tag-pill:not(.active) {
-            background-color: var(--bg-main) !important;
-            color: var(--text-muted) !important;
-            border: 1px solid var(--border-color);
-        }
-
-        .tag-pill.active {
-            border: 1px solid transparent;
-        }
+        .tag-pill.active::before { opacity: 1; }
+        .tag-pill:hover { opacity: 0.8; }
+        .tag-pill:not(.active) { background-color: var(--bg-main) !important; color: var(--text-muted) !important; border: 1px solid var(--border-color); }
+        .tag-pill.active { border: 1px solid transparent; }
 
         .c-pink { background-color: var(--tag-pink); color: var(--tag-pink-text); }
         .c-orange { background-color: var(--tag-orange); color: var(--tag-orange-text); }
@@ -273,73 +124,26 @@
         .c-red { background-color: var(--tag-red); color: var(--tag-red-text); }
         .c-grey { background-color: var(--tag-grey); color: var(--tag-grey-text); }
 
-        /* Stars Rating */
-        .stars-container {
-            display: flex;
-            gap: 0.3rem;
-            font-size: 1.8rem;
-            cursor: pointer;
-            color: var(--border-color);
-        }
+        .stars-container { display: flex; gap: 0.3rem; font-size: 1.8rem; cursor: pointer; color: var(--border-color); }
+        .star { transition: color 0.2s; }
+        .star:hover, .star.active { color: #facc15; }
 
-        .star {
-            transition: color 0.2s;
-        }
+        .hidden { display: none !important; }
+        .divider { height: 1px; background-color: var(--border-color); margin: 3rem 0 2rem 0; }
 
-        .star:hover, .star.active {
-            color: #facc15;
-        }
-
-        /* Utilities */
-        .hidden {
-            display: none !important;
-        }
-
-        .divider {
-            height: 1px;
-            background-color: var(--border-color);
-            margin: 3rem 0 2rem 0;
-        }
-
-        /* Submit Button */
-        .submit-container {
-            display: flex;
-            flex-direction: column;
-        }
-
+        .submit-container { display: flex; flex-direction: column; }
         .submit-btn {
-            background-color: #000;
-            color: var(--accent-green);
-            border: none;
-            padding: 0.8rem 1.5rem;
-            font-size: 0.95rem;
-            font-weight: 600;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: opacity 0.3s;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            width: max-content;
+            background-color: #000; color: var(--accent-green); border: none; padding: 0.8rem 1.5rem;
+            font-size: 0.95rem; font-weight: 600; border-radius: 6px; cursor: pointer; transition: opacity 0.3s;
+            display: inline-flex; align-items: center; gap: 0.5rem; width: max-content;
         }
-
-        .submit-btn:hover {
-            opacity: 0.8;
-        }
+        .submit-btn:hover { opacity: 0.8; }
 
         #message {
-            margin-top: 1.5rem;
-            font-size: 0.9rem;
-            padding: 1rem;
-            border-radius: 6px;
-            background-color: var(--bg-input);
-            border: 1px solid var(--border-color);
+            margin-top: 1.5rem; font-size: 0.9rem; padding: 1rem; border-radius: 6px;
+            background-color: var(--bg-input); border: 1px solid var(--border-color);
         }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -355,13 +159,12 @@
             <div class="password-wrapper">
                 <input type="password" id="codigo" required>
                 <button type="button" class="toggle-password" id="togglePassword" aria-label="Toggle password visibility">
-                    <!-- Icono de ojo abierto por defecto -->
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-icon"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                 </button>
             </div>
-            <!-- Botón rastreador añadido -->
+            <!-- CORRECCIÓN AQUÍ: Ruta relativa (sin la barra inicial) -->
             <div style="margin-top: 0.8rem; font-size: 0.85rem;">
-                <a href="/tracking.html" style="color: var(--accent-green); text-decoration: none; font-weight: 500; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">➔ Track your latest level status</a>
+                <a href="tracking.html" style="color: var(--accent-green); text-decoration: none; font-weight: 500; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">➔ Track your latest level status</a>
             </div>
         </div>
 
@@ -536,8 +339,6 @@
 
 <script>
     // --- UI LOGIC (Tally Styling) ---
-    
-    // Toggle Password Visibility Logic
     const togglePassword = document.getElementById('togglePassword');
     const codigoInput = document.getElementById('codigo');
 
@@ -546,10 +347,8 @@
         codigoInput.setAttribute('type', type);
         
         if (type === 'text') {
-            // Icono de ojo tachado (ocultar)
             togglePassword.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-icon"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>';
         } else {
-            // Icono de ojo normal (mostrar)
             togglePassword.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-icon"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
         }
     });
@@ -586,105 +385,74 @@
     });
 
     // --- TALLY CONDITIONAL LOGIC ENGINE ---
-    
     const state = {};
     const formInputs = document.querySelectorAll('input[type="radio"], input[type="checkbox"]');
     
     function updateConditions() {
-        formInputs.forEach(input => {
-            if (input.type === 'radio' && input.checked) {
-                state[input.name] = input.value;
-            }
-        });
+        formInputs.forEach(input => { if (input.type === 'radio' && input.checked) state[input.name] = input.value; });
 
-        // Ownership
+        // Ownership & Parts
         const groupReviewScope = document.getElementById('group-review-scope');
         const reviewScopeInputs = document.querySelectorAll('input[name="reviewScope"]');
         if (state.ownership === 'Partially') {
-            groupReviewScope.classList.remove('hidden');
-            reviewScopeInputs.forEach(el => el.required = true);
+            groupReviewScope.classList.remove('hidden'); reviewScopeInputs.forEach(el => el.required = true);
         } else {
-            groupReviewScope.classList.add('hidden');
-            reviewScopeInputs.forEach(el => el.required = false);
+            groupReviewScope.classList.add('hidden'); reviewScopeInputs.forEach(el => el.required = false);
         }
 
-        // Parts
         const groupParts = document.getElementById('group-parts');
-        if (state.ownership === 'Partially' && state.reviewScope === 'Part') {
-            groupParts.classList.remove('hidden');
-        } else {
-            groupParts.classList.add('hidden');
-        }
+        if (state.ownership === 'Partially' && state.reviewScope === 'Part') groupParts.classList.remove('hidden');
+        else groupParts.classList.add('hidden');
 
         // Permission
         const groupPermission = document.getElementById('group-permission');
         const permInputs = document.querySelectorAll('input[name="permission"]');
         if (state.ownership === 'No' || (state.ownership === 'Partially' && state.reviewScope === 'All')) {
-            groupPermission.classList.remove('hidden');
-            permInputs.forEach(el => el.required = true);
+            groupPermission.classList.remove('hidden'); permInputs.forEach(el => el.required = true);
         } else {
-            groupPermission.classList.add('hidden');
-            permInputs.forEach(el => el.required = false);
+            groupPermission.classList.add('hidden'); permInputs.forEach(el => el.required = false);
         }
 
         const warningPerm = document.getElementById('warning-permission');
         const submitBtn = document.getElementById('submitBtn');
         if (!groupPermission.classList.contains('hidden') && state.permission === 'No') {
-            warningPerm.classList.remove('hidden');
-            submitBtn.style.display = 'none';
+            warningPerm.classList.remove('hidden'); submitBtn.style.display = 'none';
         } else {
-            warningPerm.classList.add('hidden');
-            submitBtn.style.display = 'inline-flex';
+            warningPerm.classList.add('hidden'); submitBtn.style.display = 'inline-flex';
         }
 
         // Difficulty -> Video
         const videoInput = document.getElementById('video');
         const videoReq = document.getElementById('video-req');
         if (state.difficulty && state.difficulty.includes('Demon')) {
-            videoInput.required = true;
-            videoReq.classList.remove('hidden');
+            videoInput.required = true; videoReq.classList.remove('hidden');
         } else {
-            videoInput.required = false;
-            videoReq.classList.add('hidden');
+            videoInput.required = false; videoReq.classList.add('hidden');
         }
 
         // Rated -> Stars/Preview
         const groupStars = document.getElementById('group-stars');
         const groupPreview = document.getElementById('group-preview');
         const previewInputs = document.querySelectorAll('input[name="preview"]');
-        
         if (state.rated === 'Yes') {
-            groupStars.classList.remove('hidden');
-            groupPreview.classList.add('hidden');
-            previewInputs.forEach(el => el.required = false);
+            groupStars.classList.remove('hidden'); groupPreview.classList.add('hidden'); previewInputs.forEach(el => el.required = false);
         } else {
-            groupStars.classList.add('hidden');
-            groupPreview.classList.remove('hidden');
-            previewInputs.forEach(el => el.required = true);
+            groupStars.classList.add('hidden'); groupPreview.classList.remove('hidden'); previewInputs.forEach(el => el.required = true);
         }
 
         // Comments
         const groupComments = document.getElementById('group-comments');
-        if (state.commentsCheck === 'Yes') {
-            groupComments.classList.remove('hidden');
-        } else {
-            groupComments.classList.add('hidden');
-        }
+        if (state.commentsCheck === 'Yes') groupComments.classList.remove('hidden');
+        else groupComments.classList.add('hidden');
     }
 
-    formInputs.forEach(input => {
-        input.addEventListener('change', updateConditions);
-    });
+    formInputs.forEach(input => { input.addEventListener('change', updateConditions); });
 
-    // Special logic for the "Other" tag
     document.querySelectorAll('input[name="tags"]').forEach(chk => {
         chk.addEventListener('change', (e) => {
-            if (e.target.value === 'Other') {
-                document.getElementById('otherTagInput').classList.toggle('hidden', !e.target.checked);
-            }
+            if (e.target.value === 'Other') document.getElementById('otherTagInput').classList.toggle('hidden', !e.target.checked);
         });
     });
-
 
     // --- FORM SUBMIT LOGIC ---
     const form = document.getElementById('levelForm');
@@ -694,19 +462,13 @@
         e.preventDefault();
         
         let selectedTags = Array.from(document.querySelectorAll('input[name="tags"]:checked')).map(cb => cb.value);
-        if (selectedTags.length === 0) {
-            alert("Please select at least one tag.");
-            return;
-        }
+        if (selectedTags.length === 0) { alert("Please select at least one tag."); return; }
         if (selectedTags.includes('Other')) {
             const otherVal = document.getElementById('otherTagInput').value;
             if(otherVal) selectedTags.push(`Other: ${otherVal}`);
         }
 
-        if (state.rated === 'Yes' && starsInput.value === "0") {
-            alert("Please select a star rating.");
-            return;
-        }
+        if (state.rated === 'Yes' && starsInput.value === "0") { alert("Please select a star rating."); return; }
 
         messageDiv.classList.remove('hidden');
         messageDiv.innerHTML = "Verifying identity and submitting...";
@@ -735,8 +497,7 @@
 
         try {
             const response = await fetch('/.netlify/functions/submit-request', {
-                method: 'POST',
-                body: JSON.stringify(payload)
+                method: 'POST', body: JSON.stringify(payload)
             });
             const result = await response.json();
             
@@ -756,10 +517,8 @@
                 
                 document.getElementById('otherTagInput').classList.add('hidden');
 
-                // Asegurar que el icono de ojo regrese a su estado cerrado al limpiar
                 codigoInput.setAttribute('type', 'password');
                 togglePassword.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-icon"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
-
             } else {
                 messageDiv.style.color = "#ff4d4d";
                 messageDiv.style.borderColor = "#ff4d4d";
