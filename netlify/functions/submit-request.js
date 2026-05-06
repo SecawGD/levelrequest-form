@@ -1,4 +1,3 @@
-```javascript
 const { GoogleSpreadsheet } = require('google-spreadsheet');
 const { JWT } = require('google-auth-library');
 
@@ -92,6 +91,3 @@ exports.handler = async (event) => {
         return { statusCode: 500, body: JSON.stringify({ error: err.message }) };
     }
 };
-
-
-```
