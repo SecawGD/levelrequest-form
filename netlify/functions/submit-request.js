@@ -1,3 +1,4 @@
+```javascript
 const { GoogleSpreadsheet } = require('google-spreadsheet');
 const { JWT } = require('google-auth-library');
 
@@ -50,23 +51,26 @@ exports.handler = async (event) => {
             // Obtenemos la última fecha registrada por este usuario
             const lastDateStr = userRow.get('fecha');
             
-            // Reemplazamos el espacio por una 'T' para asegurar que Javascript pueda parsear
-            // correctamente tanto las fechas viejas (ISO) como las nuevas (Friendly)
-            const parsedDateStr = lastDateStr.includes('T') ? lastDateStr : lastDateStr.replace(' ', 'T');
-            const lastDate = new Date(parsedDateStr);
-            
-            // Si la fecha es válida, procedemos a calcular la diferencia
-            if (!isNaN(lastDate)) {
-                const diffDays = (now - lastDate) / (1000 * 60 * 60 * 24);
-                if (diffDays < 7) {
-                    const faltan = Math.ceil(7 - diffDays);
-                    return { statusCode: 403, body: JSON.stringify({ error: `Hi ${nombreReal}, you must wait ${faltan} more days to send another level.` }) };
+            if (lastDateStr) {
+                // Reemplazamos el espacio por una 'T' para asegurar que Javascript pueda parsear
+                // correctamente tanto las fechas viejas (ISO) como las nuevas (Friendly)
+                const parsedDateStr = lastDateStr.includes('T') ? lastDateStr : lastDateStr.replace(' ', 'T');
+                const lastDate = new Date(parsedDateStr);
+                
+                // Si la fecha es válida, procedemos a calcular la diferencia
+                if (!isNaN(lastDate)) {
+                    const diffDays = (now - lastDate) / (1000 * 60 * 60 * 24);
+                    if (diffDays < 7) {
+                        const faltan = Math.ceil(7 - diffDays);
+                        return { statusCode: 403, body: JSON.stringify({ error: `Hi ${nombreReal}, you must wait ${faltan} more days to send another level.` }) };
+                    }
                 }
             }
         }
 
         // 3. GUARDAR TODOS LOS DATOS
         await sheetNiveles.addRow({
+            estado: 'Pendiente',
             fecha: friendlyDate,
             codigo: codigo,
             levelID: levelID,
@@ -88,3 +92,6 @@ exports.handler = async (event) => {
         return { statusCode: 500, body: JSON.stringify({ error: err.message }) };
     }
 };
+
+
+```
