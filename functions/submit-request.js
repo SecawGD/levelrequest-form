@@ -1,31 +1,25 @@
-// ... existing code ...
-import { GoogleSpreadsheet } from 'https://esm.sh/google-spreadsheet@4.1.1';
-import { JWT } from 'https://esm.sh/google-auth-library@9.0.0';
+import { GoogleSpreadsheet } from 'google-spreadsheet';
+import { JWT } from 'google-auth-library';
 
 export async function onRequestPost(context) {
-// ... existing code ...
-
-export async function onRequestPost(context) {
-    // request contiene los datos enviados, env contiene tus variables de entorno
     const { request, env } = context;
 
     try {
         const data = await request.json();
         const { codigo, levelID, ownership, parts, permission, difficulty, video, tags, rated, stars, preview, comments, feedback } = data;
-        
+
         const serviceAccountAuth = new JWT({
             email: env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-            key: env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n'),
-            scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+            key: env.GOOGLE_PRIVATE_KEY.replace(/\\\\n/g, '\\n'),
+            scopes: ['<https://www.googleapis.com/auth/spreadsheets>'],
         });
 
         const doc = new GoogleSpreadsheet(env.GOOGLE_SHEET_ID, serviceAccountAuth);
-        
+
         await doc.loadInfo();
         const sheetNiveles = doc.sheetsByIndex[0];
         const sheetUsuarios = doc.sheetsByIndex[1];
 
-        // 1. VERIFICACIÓN DE IDENTIDAD
         const usuariosRows = await sheetUsuarios.getRows();
         const validUser = usuariosRows.find(row => row.get('codigo') === codigo);
 
@@ -37,12 +31,9 @@ export async function onRequestPost(context) {
         }
 
         const nombreReal = validUser.get('nombre');
-
-        // 2. LÓGICA DE 7 DÍAS
         const nivelesRows = await sheetNiveles.getRows();
         const now = new Date();
-        
-        // Creamos una fecha amigable (YYYY-MM-DD HH:mm:ss) para la base de datos
+
         const year = now.getFullYear();
         const month = String(now.getMonth() + 1).padStart(2, '0');
         const day = String(now.getDate()).padStart(2, '0');
@@ -51,18 +42,16 @@ export async function onRequestPost(context) {
         const seconds = String(now.getSeconds()).padStart(2, '0');
         const friendlyDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 
-        // BUG ARREGLADO: Hacemos una copia del array antes de hacer reverse()
         const reversedRows = [...nivelesRows].reverse();
         const userRow = reversedRows.find(row => row.get('codigo') === codigo);
 
         if (userRow) {
-            // Obtenemos la última fecha registrada por este usuario
             const lastDateStr = userRow.get('fecha');
-            
+
             if (lastDateStr) {
                 const parsedDateStr = lastDateStr.includes('T') ? lastDateStr : lastDateStr.replace(' ', 'T');
                 const lastDate = new Date(parsedDateStr);
-                
+
                 if (!isNaN(lastDate)) {
                     const diffDays = (now - lastDate) / (1000 * 60 * 60 * 24);
                     if (diffDays < 7) {
@@ -76,7 +65,6 @@ export async function onRequestPost(context) {
             }
         }
 
-        // 3. GUARDAR TODOS LOS DATOS
         await sheetNiveles.addRow({
             estado: 'Pendiente',
             fecha: friendlyDate,
@@ -99,7 +87,7 @@ export async function onRequestPost(context) {
             status: 200,
             headers: { "Content-Type": "application/json" }
         });
-        
+
     } catch (err) {
         return new Response(JSON.stringify({ error: err.message }), {
             status: 500,
