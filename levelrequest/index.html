@@ -6,7 +6,7 @@
     <title>Level Request</title>
     <style>
         :root {
-            --bg-main: #131b16; /* Tally dark green background */
+            --bg-main: #131b16; 
             --bg-input: #1a231d;
             --border-color: #2c3b31;
             --text-main: #e0e6e2;
@@ -14,12 +14,10 @@
             --accent-green: #a0d175;
             --warning-red: #ff6b6b;
             
-            /* Tally Option Active Colors */
             --active-bg: #162a36;
             --active-border: #24496b;
             --active-letter-bg: #285d8c;
             
-            /* Tags Colors */
             --tag-pink: #fce4ec; --tag-pink-text: #c2185b;
             --tag-orange: #fff3e0; --tag-orange-text: #e65100;
             --tag-yellow: #fff8e1; --tag-yellow-text: #f57f17;
@@ -87,7 +85,6 @@
             margin-top: -0.2rem;
         }
 
-        /* Warning Callout */
         .warning-callout {
             background-color: rgba(255, 107, 107, 0.1);
             border-left: 4px solid var(--warning-red);
@@ -99,7 +96,6 @@
             animation: fadeIn 0.3s ease-in-out;
         }
 
-        /* Text Inputs */
         input[type="text"], input[type="number"], input[type="url"], input[type="password"], textarea {
             width: 100%;
             padding: 0.8rem 1rem;
@@ -118,7 +114,6 @@
             background-color: #1e2821;
         }
 
-        /* Password Wrapper for the Eye Icon */
         .password-wrapper {
             position: relative;
             display: flex;
@@ -161,7 +156,6 @@
             min-height: 80px;
         }
 
-        /* Tally Radio/Checkbox Options */
         .options-list {
             display: flex;
             flex-direction: column;
@@ -207,7 +201,6 @@
             color: #fff;
         }
 
-        /* Tags / Pills */
         .tags-container {
             display: flex;
             flex-wrap: wrap;
@@ -234,7 +227,6 @@
             display: none;
         }
         
-        /* The checkmark icon inside the tag (Space reserved, invisible by default) */
         .tag-pill::before {
             content: '✓';
             font-size: 0.8rem;
@@ -272,7 +264,6 @@
         .c-red { background-color: var(--tag-red); color: var(--tag-red-text); }
         .c-grey { background-color: var(--tag-grey); color: var(--tag-grey-text); }
 
-        /* Stars Rating */
         .stars-container {
             display: flex;
             gap: 0.3rem;
@@ -289,7 +280,6 @@
             color: #facc15;
         }
 
-        /* Utilities */
         .hidden {
             display: none !important;
         }
@@ -300,7 +290,6 @@
             margin: 3rem 0 2rem 0;
         }
 
-        /* Submit Button */
         .submit-container {
             display: flex;
             flex-direction: column;
@@ -333,6 +322,7 @@
             border-radius: 6px;
             background-color: var(--bg-input);
             border: 1px solid var(--border-color);
+            word-wrap: break-word;
         }
 
         @keyframes fadeIn {
@@ -354,11 +344,9 @@
             <div class="password-wrapper">
                 <input type="password" id="codigo" required>
                 <button type="button" class="toggle-password" id="togglePassword" aria-label="Toggle password visibility">
-                    <!-- Icono de ojo abierto por defecto -->
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-icon"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                 </button>
             </div>
-            <!-- Botón rastreador añadido -->
             <div style="margin-top: 0.8rem; font-size: 0.85rem;">
                 <a href="/tracking.html" style="color: var(--accent-green); text-decoration: none; font-weight: 500; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">➔ Track your latest level status</a>
             </div>
@@ -535,8 +523,6 @@
 
 <script>
     // --- UI LOGIC (Tally Styling) ---
-    
-    // Toggle Password Visibility Logic
     const togglePassword = document.getElementById('togglePassword');
     const codigoInput = document.getElementById('codigo');
 
@@ -545,10 +531,8 @@
         codigoInput.setAttribute('type', type);
         
         if (type === 'text') {
-            // Icono de ojo tachado (ocultar)
             togglePassword.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-icon"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>';
         } else {
-            // Icono de ojo normal (mostrar)
             togglePassword.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-icon"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
         }
     });
@@ -585,7 +569,6 @@
     });
 
     // --- TALLY CONDITIONAL LOGIC ENGINE ---
-    
     const state = {};
     const formInputs = document.querySelectorAll('input[type="radio"], input[type="checkbox"]');
     
@@ -675,7 +658,6 @@
         input.addEventListener('change', updateConditions);
     });
 
-    // Special logic for the "Other" tag
     document.querySelectorAll('input[name="tags"]').forEach(chk => {
         chk.addEventListener('change', (e) => {
             if (e.target.value === 'Other') {
@@ -733,11 +715,26 @@
         };
 
         try {
+            // CORRECCIÓN APLICADA AQUÍ: Se añade el Header y se protege el response.json()
             const response = await fetch('/submit-request', {
                 method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json' // OBLIGATORIO para enviar datos JSON
+                },
                 body: JSON.stringify(payload)
             });
-            const result = await response.json();
+            
+            // Verificamos si la respuesta realmente viene como JSON (para evitar el Syntax Error)
+            const contentType = response.headers.get("content-type");
+            let result = {};
+            
+            if (contentType && contentType.includes("application/json")) {
+                result = await response.json();
+            } else {
+                // Si la respuesta no es JSON, algo falló gravemente en el backend o en la red
+                const errorText = await response.text();
+                throw new Error(`Cloudflare devolvió un error (HTTP ${response.status}). Asegúrate de estar ejecutando la app a través del servidor local (Wrangler).`);
+            }
             
             if (response.ok) {
                 messageDiv.style.color = "var(--accent-green)";
@@ -755,7 +752,6 @@
                 
                 document.getElementById('otherTagInput').classList.add('hidden');
 
-                // Asegurar que el icono de ojo regrese a su estado cerrado al limpiar
                 codigoInput.setAttribute('type', 'password');
                 togglePassword.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-icon"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
 
@@ -767,7 +763,8 @@
         } catch (err) {
             messageDiv.style.color = "#ff4d4d";
             messageDiv.style.borderColor = "#ff4d4d";
-            messageDiv.innerHTML = "❌ Connection error.";
+            // MODIFICADO: Ahora mostrará el error REAL para que puedas debugearlo mejor.
+            messageDiv.innerHTML = "❌ Error: " + err.message;
         }
     });
     
@@ -776,6 +773,3 @@
 
 </body>
 </html>
-
-
-```
