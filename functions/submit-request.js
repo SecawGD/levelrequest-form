@@ -4,20 +4,21 @@ async function getGoogleAuthToken(env) {
     const now = Math.floor(Date.now() / 1000);
     const claim = {
         iss: env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-        scope: '<https://www.googleapis.com/auth/spreadsheets>',
-        aud: '<https://oauth2.googleapis.com/token>',
+        scope: 'https://www.googleapis.com/auth/spreadsheets', // Corregido: Se eliminaron los < >
+        aud: 'https://oauth2.googleapis.com/token',            // Corregido: Se eliminaron los < >
         exp: now + 3600,
         iat: now
     };
 
-    const encodedHeader = btoa(JSON.stringify(header)).replace(/=/g, '').replace(/\\+/g, '-').replace(/\\//g, '_');
-    const encodedClaim = btoa(JSON.stringify(claim)).replace(/=/g, '').replace(/\\+/g, '-').replace(/\\//g, '_');
+    // Corregido: Expresiones regulares arregladas (/\+/g en vez de /\\+/g)
+    const encodedHeader = btoa(JSON.stringify(header)).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+    const encodedClaim = btoa(JSON.stringify(claim)).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
     const signatureInput = `${encodedHeader}.${encodedClaim}`;
 
     let privateKey = env.GOOGLE_PRIVATE_KEY;
-    if (privateKey.includes('\\\\n')) privateKey = privateKey.replace(/\\\\n/g, '\\n');
+    if (privateKey.includes('\\n')) privateKey = privateKey.replace(/\\n/g, '\n');
 
-    const pemContents = privateKey.replace(/-----BEGIN PRIVATE KEY-----/g, "").replace(/-----END PRIVATE KEY-----/g, "").replace(/\\s/g, "");
+    const pemContents = privateKey.replace(/-----BEGIN PRIVATE KEY-----/g, "").replace(/-----END PRIVATE KEY-----/g, "").replace(/\s/g, "");
     const binaryDer = Uint8Array.from(atob(pemContents), c => c.charCodeAt(0));
 
     const key = await crypto.subtle.importKey(
@@ -34,10 +35,10 @@ async function getGoogleAuthToken(env) {
     const bytes = new Uint8Array(signature);
     for (let i = 0; i < bytes.byteLength; i++) binarySignature += String.fromCharCode(bytes[i]);
 
-    const encodedSignature = btoa(binarySignature).replace(/=/g, '').replace(/\\+/g, '-').replace(/\\//g, '_');
+    const encodedSignature = btoa(binarySignature).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
     const jwt = `${signatureInput}.${encodedSignature}`;
 
-    const tokenResponse = await fetch('<https://oauth2.googleapis.com/token>', {
+    const tokenResponse = await fetch('https://oauth2.googleapis.com/token', { // Corregido: Se eliminaron los < >
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: `grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Ajwt-bearer&assertion=${jwt}`
