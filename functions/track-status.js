@@ -1,5 +1,9 @@
-import { GoogleSpreadsheet } from 'google-spreadsheet';
-import { JWT } from 'google-auth-library';
+// ... existing code ...
+import { GoogleSpreadsheet } from 'https://esm.sh/google-spreadsheet@4.1.1';
+import { JWT } from 'https://esm.sh/google-auth-library@9.0.0';
+
+export async function onRequestPost(context) {
+// ... existing code ...
 
 export async function onRequestPost(context) {
     const { request, env } = context;
