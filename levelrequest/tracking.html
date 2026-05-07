@@ -1,46 +1,342 @@
-```javascript
-const { GoogleSpreadsheet } = require('google-spreadsheet');
-const { JWT } = require('google-auth-library');
-
-exports.handler = async (event) => {
-    if (event.httpMethod !== "POST") return { statusCode: 405, body: "Method Not Allowed" };
-
-    const { codigo } = JSON.parse(event.body);
-    
-    if (!codigo) {
-        return { statusCode: 400, body: JSON.stringify({ error: "Access code is required." }) };
-    }
-
-    const serviceAccountAuth = new JWT({
-        email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-        key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n'),
-        scopes: ['https://www.googleapis.com/auth/spreadsheets'],
-    });
-
-    const doc = new GoogleSpreadsheet(process.env.GOOGLE_SHEET_ID, serviceAccountAuth);
-    
-    try {
-        await doc.loadInfo();
-        const sheetNiveles = doc.sheetsByIndex[0];
-        const nivelesRows = await sheetNiveles.getRows();
-
-        const userRow = nivelesRows.reverse().find(row => row.get('codigo') === codigo);
-
-        if (!userRow) {
-            return { statusCode: 404, body: JSON.stringify({ error: "No level request found for this access code." }) };
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Track Level Status</title>
+    <style>
+        :root {
+            --bg-main: #131b16; 
+            --bg-input: #1a231d;
+            --border-color: #2c3b31;
+            --text-main: #e0e6e2;
+            --text-muted: #8e9b92;
+            --accent-green: #a0d175;
+            --warning-red: #ff6b6b;
+            --info-blue: #4dabf7;
         }
 
-        return { 
-            statusCode: 200, 
-            body: JSON.stringify({ 
-                levelID: userRow.get('levelID'),
-                estado: userRow.get('estado') || 'Pendiente',
-                fecha: userRow.get('fecha')
-            }) 
-        };
-    } catch (err) {
-        return { statusCode: 500, body: JSON.stringify({ error: err.message }) };
-    }
-};
+        * {
+            box-sizing: border-box;
+        }
 
-```
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            margin: 0;
+            padding: 3rem 1.5rem;
+            display: flex;
+            justify-content: center;
+            line-height: 1.5;
+        }
+
+        .form-container {
+            width: 100%;
+            max-width: 600px;
+        }
+
+        h1 {
+            color: var(--accent-green);
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .header-subtext {
+            color: var(--text-muted);
+            margin-bottom: 2.5rem;
+        }
+
+        .question-group {
+            margin-bottom: 2.5rem;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .question-title {
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .sub-text {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+            margin-top: -0.2rem;
+        }
+
+        input[type="password"], input[type="text"] {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background-color: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-main);
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--text-muted);
+            background-color: #1e2821;
+        }
+
+        .password-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .password-wrapper input {
+            padding-right: 2.8rem;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 0.8rem;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s;
+        }
+
+        .toggle-password:hover {
+            color: var(--text-main);
+        }
+
+        .eye-icon {
+            width: 20px;
+            height: 20px;
+        }
+
+        .submit-btn {
+            background-color: #000;
+            color: var(--accent-green);
+            border: none;
+            padding: 0.8rem 1.5rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: opacity 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            width: max-content;
+        }
+
+        .submit-btn:hover {
+            opacity: 0.8;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 1.5rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: var(--text-main);
+        }
+
+        /* Result Card Styles */
+        .result-card {
+            margin-top: 2rem;
+            background-color: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        .result-item {
+            margin-bottom: 1rem;
+        }
+
+        .result-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .result-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.3rem;
+        }
+
+        .result-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            background-color: #2c3b31; /* Default fallback */
+        }
+
+        .status-pendiente { background-color: rgba(77, 171, 247, 0.15); color: var(--info-blue); border: 1px solid rgba(77, 171, 247, 0.3); }
+        .status-completado { background-color: rgba(160, 209, 117, 0.15); color: var(--accent-green); border: 1px solid rgba(160, 209, 117, 0.3); }
+        .status-rechazado { background-color: rgba(255, 107, 107, 0.15); color: var(--warning-red); border: 1px solid rgba(255, 107, 107, 0.3); }
+
+        #message {
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            padding: 1rem;
+            border-radius: 6px;
+            background-color: var(--bg-input);
+            border: 1px solid var(--border-color);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <h1>Track Status</h1>
+    <div class="header-subtext">Check the current status of your latest level request.</div>
+
+    <form id="trackForm">
+        <div class="question-group">
+            <div class="question-title">Access Code <span style="color:var(--text-muted)">*</span></div>
+            <div class="sub-text">Enter your private identity code.</div>
+            <div class="password-wrapper">
+                <input type="password" id="codigo" required>
+                <button type="button" class="toggle-password" id="togglePassword" aria-label="Toggle password visibility">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-icon"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                </button>
+            </div>
+        </div>
+
+        <button type="submit" class="submit-btn" id="submitBtn">Check Status ➔</button>
+        <div id="message" class="hidden"></div>
+    </form>
+
+    <!-- Card para mostrar los resultados -->
+    <div id="resultCard" class="result-card hidden">
+        <div class="result-item">
+            <div class="result-label">Level ID</div>
+            <div class="result-value" id="resLevelID">---</div>
+        </div>
+        <div class="result-item">
+            <div class="result-label">Status</div>
+            <div class="result-value">
+                <span class="status-badge" id="resStatus">---</span>
+            </div>
+        </div>
+        <div class="result-item">
+            <div class="result-label">Submitted On</div>
+            <div class="result-value" id="resDate" style="font-weight: 400; color: var(--text-muted);">---</div>
+        </div>
+    </div>
+
+    <a href="/levelrequest" class="back-link">← Back to Level Request</a>
+</div>
+
+<script>
+    // Toggle Password Visibility
+    const togglePassword = document.getElementById('togglePassword');
+    const codigoInput = document.getElementById('codigo');
+
+    togglePassword.addEventListener('click', () => {
+        const type = codigoInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        codigoInput.setAttribute('type', type);
+        
+        if (type === 'text') {
+            togglePassword.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-icon"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>';
+        } else {
+            togglePassword.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-icon"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
+        }
+    });
+
+    // Form Submit Logic
+    const form = document.getElementById('trackForm');
+    const messageDiv = document.getElementById('message');
+    const resultCard = document.getElementById('resultCard');
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const codigo = codigoInput.value;
+
+        // Reset UI
+        resultCard.classList.add('hidden');
+        messageDiv.classList.remove('hidden');
+        messageDiv.innerHTML = "Searching for your level...";
+        messageDiv.style.color = "var(--text-main)";
+        messageDiv.style.borderColor = "var(--border-color)";
+
+        try {
+            // RUTA CORRECTA PARA CLOUDFLARE
+            const response = await fetch('/track-status', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ codigo })
+            });
+            
+            const result = await response.json();
+            
+            if (response.ok) {
+                // Ocultar mensaje de carga
+                messageDiv.classList.add('hidden');
+                
+                // Mostrar resultados
+                document.getElementById('resLevelID').textContent = result.levelID;
+                
+                const statusSpan = document.getElementById('resStatus');
+                const estado = result.estado || 'Pendiente';
+                statusSpan.textContent = estado;
+                
+                // Aplicar color según el estado (puedes ajustar las palabras según lo que uses en tu Google Sheet)
+                statusSpan.className = 'status-badge'; // reset
+                if (estado.toLowerCase() === 'pendiente') statusSpan.classList.add('status-pendiente');
+                else if (estado.toLowerCase() === 'completado' || estado.toLowerCase() === 'listo') statusSpan.classList.add('status-completado');
+                else if (estado.toLowerCase() === 'rechazado' || estado.toLowerCase() === 'denegado') statusSpan.classList.add('status-rechazado');
+
+                // Formatear fecha si existe
+                if (result.fecha) {
+                    document.getElementById('resDate').textContent = result.fecha;
+                } else {
+                    document.getElementById('resDate').textContent = "Unknown date";
+                }
+
+                resultCard.classList.remove('hidden');
+
+            } else {
+                messageDiv.style.color = "#ff4d4d";
+                messageDiv.style.borderColor = "#ff4d4d";
+                messageDiv.innerHTML = "❌ " + (result.error || "Error searching for level.");
+            }
+        } catch (err) {
+            messageDiv.style.color = "#ff4d4d";
+            messageDiv.style.borderColor = "#ff4d4d";
+            messageDiv.innerHTML = "❌ Connection error.";
+        }
+    });
+</script>
+
+</body>
+</html>

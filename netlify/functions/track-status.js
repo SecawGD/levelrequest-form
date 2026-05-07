@@ -1,43 +1,56 @@
-const { GoogleSpreadsheet } = require('google-spreadsheet');
-const { JWT } = require('google-auth-library');
+import { GoogleSpreadsheet } from 'google-spreadsheet';
+import { JWT } from 'google-auth-library';
 
-exports.handler = async (event) => {
-    if (event.httpMethod !== "POST") return { statusCode: 405, body: "Method Not Allowed" };
+export async function onRequestPost(context) {
+    const { request, env } = context;
 
-    const { codigo } = JSON.parse(event.body);
-    
-    if (!codigo) {
-        return { statusCode: 400, body: JSON.stringify({ error: "Access code is required." }) };
-    }
-
-    const serviceAccountAuth = new JWT({
-        email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-        key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n'),
-        scopes: ['https://www.googleapis.com/auth/spreadsheets'],
-    });
-
-    const doc = new GoogleSpreadsheet(process.env.GOOGLE_SHEET_ID, serviceAccountAuth);
-    
     try {
+        const data = await request.json();
+        const { codigo } = data;
+        
+        if (!codigo) {
+            return new Response(JSON.stringify({ error: "Access code is required." }), {
+                status: 400,
+                headers: { "Content-Type": "application/json" }
+            });
+        }
+
+        const serviceAccountAuth = new JWT({
+            email: env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+            key: env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+            scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+        });
+
+        const doc = new GoogleSpreadsheet(env.GOOGLE_SHEET_ID, serviceAccountAuth);
+        
         await doc.loadInfo();
         const sheetNiveles = doc.sheetsByIndex[0];
         const nivelesRows = await sheetNiveles.getRows();
 
-        const userRow = nivelesRows.reverse().find(row => row.get('codigo') === codigo);
+        // BUG ARREGLADO: Evitamos mutar el array original
+        const reversedRows = [...nivelesRows].reverse();
+        const userRow = reversedRows.find(row => row.get('codigo') === codigo);
 
         if (!userRow) {
-            return { statusCode: 404, body: JSON.stringify({ error: "No level request found for this access code." }) };
+            return new Response(JSON.stringify({ error: "No level request found for this access code." }), {
+                status: 404,
+                headers: { "Content-Type": "application/json" }
+            });
         }
 
-        return { 
-            statusCode: 200, 
-            body: JSON.stringify({ 
-                levelID: userRow.get('levelID'),
-                estado: userRow.get('estado') || 'Pendiente',
-                fecha: userRow.get('fecha')
-            }) 
-        };
+        return new Response(JSON.stringify({ 
+            levelID: userRow.get('levelID'),
+            estado: userRow.get('estado') || 'Pendiente',
+            fecha: userRow.get('fecha')
+        }), {
+            status: 200,
+            headers: { "Content-Type": "application/json" }
+        });
+        
     } catch (err) {
-        return { statusCode: 500, body: JSON.stringify({ error: err.message }) };
+        return new Response(JSON.stringify({ error: err.message }), {
+            status: 500,
+            headers: { "Content-Type": "application/json" }
+        });
     }
-};
+}
