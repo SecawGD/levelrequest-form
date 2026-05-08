@@ -198,7 +198,7 @@
         .stepper-item::before {
             content: "";
             position: absolute;
-            top: 8px; /* Mitad del círculo */
+            top: 8px; 
             left: -50%;
             width: 100%;
             height: 3px;
@@ -253,6 +253,19 @@
         }
         .stepper-item.active .step-name {
             color: var(--accent-green);
+        }
+
+        /* --- Dynamic Description CSS --- */
+        .status-description {
+            margin-top: 2rem;
+            padding: 1rem;
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 6px;
+            border-left: 3px solid var(--accent-green);
+            font-size: 0.95rem;
+            color: var(--text-main);
+            line-height: 1.5;
+            animation: fadeIn 0.4s ease-in-out;
         }
 
         #message {
@@ -326,6 +339,8 @@
                 <div class="step-name">Finished</div>
             </div>
         </div>
+
+        <div id="statusDescription" class="status-description"></div>
     </div>
 
     <a href="index.html" class="back-link">← Back to Level Request</a>
@@ -347,10 +362,19 @@
         }
     });
 
+    // Descripciones dinámicas en inglés
+    const stateDescriptions = [
+        "I haven't seen your level yet. But your level was successfully sent to me and is already in my database!",
+        "I have seen your request! Your level will be played by me shortly.",
+        "I have already played your level, I am analyzing it, and preparing very detailed feedback for you.",
+        "Your level has been reviewed. If you still haven't received the feedback, please wait a moment or contact me."
+    ];
+
     // Form Submit Logic
     const form = document.getElementById('trackForm');
     const messageDiv = document.getElementById('message');
     const resultCard = document.getElementById('resultCard');
+    const descBox = document.getElementById('statusDescription');
     const steps = [
         document.getElementById('step-1'),
         document.getElementById('step-2'),
@@ -387,10 +411,9 @@
                 document.getElementById('resLevelID').textContent = result.levelID;
                 document.getElementById('resDate').textContent = result.fecha || "Unknown date";
                 
-                // --- Lógica del Stepper (Puntitos de rastreo) ---
-                // Mapeamos los estados en español a su número de paso
+                // --- Lógica del Stepper ---
                 const estado = (result.estado || 'pendiente').toLowerCase().trim();
-                let currentStepIndex = 0; // 0 = Pending, 1 = Seen, 2 = Reviewing, 3 = Finished
+                let currentStepIndex = 0; 
                 
                 if (estado === 'pendiente') currentStepIndex = 0;
                 else if (estado === 'visto') currentStepIndex = 1;
@@ -400,15 +423,12 @@
                 // Actualizamos las clases CSS de cada puntito
                 steps.forEach((step, index) => {
                     step.classList.remove('completed', 'active');
-                    
-                    if (index < currentStepIndex) {
-                        // Pasos anteriores ya completados
-                        step.classList.add('completed');
-                    } else if (index === currentStepIndex) {
-                        // Paso actual parpadeante o remarcado
-                        step.classList.add('active');
-                    }
+                    if (index < currentStepIndex) step.classList.add('completed');
+                    else if (index === currentStepIndex) step.classList.add('active');
                 });
+
+                // Actualizamos la descripción
+                descBox.textContent = stateDescriptions[currentStepIndex];
 
                 resultCard.classList.remove('hidden');
 
