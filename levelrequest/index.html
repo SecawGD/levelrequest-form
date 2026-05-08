@@ -323,6 +323,7 @@
             background-color: var(--bg-input);
             border: 1px solid var(--border-color);
             word-wrap: break-word;
+            line-height: 1.6;
         }
 
         @keyframes fadeIn {
@@ -337,7 +338,6 @@
     <h1>Level Request</h1>
     <form id="levelForm">
 
-        <!-- Access Code -->
         <div class="question-group">
             <div class="question-title">Access Code <span class="req">*</span></div>
             <div class="sub-text">Your private identity code. If you have problems or if you want to change it, you can contact me.</div>
@@ -356,13 +356,11 @@
 
         <h2 style="margin-bottom: 2.5rem;">Level Info</h2>
 
-        <!-- Level ID -->
         <div class="question-group">
             <div class="question-title">ID of your level <span class="req">*</span></div>
             <input type="number" id="levelID" required placeholder="134498865">
         </div>
 
-        <!-- Ownership -->
         <div class="question-group">
             <div class="question-title">Is the level yours? <span class="req">*</span></div>
             <div class="options-list radio-group">
@@ -372,7 +370,6 @@
             </div>
         </div>
 
-        <!-- Conditional: Review Scope -->
         <div class="question-group hidden" id="group-review-scope">
             <div class="question-title">Then, do you want me to review all the level or just your part? <span class="req">*</span></div>
             <div class="options-list radio-group">
@@ -381,13 +378,11 @@
             </div>
         </div>
 
-        <!-- Conditional: Parts -->
         <div class="question-group hidden" id="group-parts">
             <div class="question-title">Please, tell me what parts of the level are yours</div>
             <textarea id="parts" placeholder="e.g. 30% to 45%"></textarea>
         </div>
 
-        <!-- Conditional: Permission -->
         <div class="question-group hidden" id="group-permission">
             <div class="question-title">Do you have the permission of the creator(s) of the level? <span class="req">*</span></div>
             <div class="options-list radio-group">
@@ -396,12 +391,10 @@
             </div>
         </div>
 
-        <!-- Warning Callout -->
         <div class="warning-callout hidden" id="warning-permission">
             I can't give feedback if the creator don't approve it.
         </div>
 
-        <!-- Difficulty -->
         <div class="question-group">
             <div class="question-title">Which difficulty would <u>you</u> consider your level? <span class="req">*</span></div>
             <div class="options-list radio-group">
@@ -419,14 +412,12 @@
             </div>
         </div>
 
-        <!-- Video -->
         <div class="question-group" id="group-video">
             <div class="question-title">Video of your level <span class="req hidden" id="video-req">*</span></div>
             <div class="sub-text">Optional if it's not a Demon</div>
             <input type="url" id="video" placeholder="https://www.youtube.com...">
         </div>
 
-        <!-- Tags -->
         <div class="question-group">
             <div class="question-title">Describe your level with one or more tags <span class="req">*</span></div>
             <div class="tags-container">
@@ -461,7 +452,6 @@
         <h2>Additional Information</h2>
         <div class="sub-text" style="margin-bottom: 2.5rem;">This is also very important for me to know</div>
 
-        <!-- Rated -->
         <div class="question-group">
             <div class="question-title">Is your level star rated? <span class="req">*</span></div>
             <div class="sub-text">(I also give feedback on rated levels, but unrated levels have more priority)</div>
@@ -471,7 +461,6 @@
             </div>
         </div>
 
-        <!-- Conditional: Stars -->
         <div class="question-group hidden" id="group-stars">
             <div class="question-title">How many stars does your level have? <span class="req">*</span></div>
             <div class="stars-container" id="starRating">
@@ -480,7 +469,6 @@
             <input type="hidden" id="starsValue" value="0">
         </div>
 
-        <!-- Preview -->
         <div class="question-group" id="group-preview">
             <div class="question-title">Is your level a Preview? <span class="req">*</span></div>
             <div class="options-list radio-group">
@@ -489,7 +477,6 @@
             </div>
         </div>
 
-        <!-- Something else -->
         <div class="question-group">
             <div class="question-title">Do you want to say something else? <span class="req">*</span></div>
             <div class="options-list radio-group">
@@ -498,13 +485,11 @@
             </div>
         </div>
 
-        <!-- Conditional: Comments -->
         <div class="question-group hidden" id="group-comments">
             <div class="question-title">What else do you want to add?</div>
             <textarea id="comments" placeholder="I made the level in only 2 months!"></textarea>
         </div>
 
-        <!-- Feedback Type -->
         <div class="question-group">
             <div class="question-title">Do you prefer a public or private feedback? <span class="req">*</span></div>
             <div class="options-list radio-group">
@@ -715,31 +700,31 @@
         };
 
         try {
-            // CORRECCIÓN APLICADA AQUÍ: Se añade el Header y se protege el response.json()
             const response = await fetch('/submit-request', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json' // OBLIGATORIO para enviar datos JSON
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(payload)
             });
             
-            // Verificamos si la respuesta realmente viene como JSON (para evitar el Syntax Error)
             const contentType = response.headers.get("content-type");
             let result = {};
             
             if (contentType && contentType.includes("application/json")) {
                 result = await response.json();
             } else {
-                // Si la respuesta no es JSON, algo falló gravemente en el backend o en la red
                 const errorText = await response.text();
-                throw new Error(`Cloudflare devolvió un error (HTTP ${response.status}). Asegúrate de estar ejecutando la app a través del servidor local (Wrangler).`);
+                throw new Error(`Error HTTP ${response.status}.`);
             }
             
             if (response.ok) {
                 messageDiv.style.color = "var(--accent-green)";
                 messageDiv.style.borderColor = "var(--accent-green)";
-                messageDiv.innerHTML = "✅ " + result.message;
+                
+                // MODIFICADO: Mensaje personalizado con enlace de seguimiento
+                messageDiv.innerHTML = `✅ ${result.message}<br>
+                                       <span style="display: block; margin-top: 0.3rem;">You can track your level status <a href="tracking.html" style="color: inherit; text-decoration: underline; font-weight: 700;">pressing here</a>.</span>`;
                 
                 form.reset();
                 document.querySelectorAll('.tally-option').forEach(o => o.classList.remove('active'));
@@ -763,7 +748,6 @@
         } catch (err) {
             messageDiv.style.color = "#ff4d4d";
             messageDiv.style.borderColor = "#ff4d4d";
-            // MODIFICADO: Ahora mostrará el error REAL para que puedas debugearlo mejor.
             messageDiv.innerHTML = "❌ Error: " + err.message;
         }
     });
