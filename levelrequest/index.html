@@ -96,6 +96,19 @@
             animation: fadeIn 0.3s ease-in-out;
         }
 
+        /* Nuevo estilo para la descripción dinámica del feedback */
+        .feedback-callout {
+            margin-top: 1rem;
+            padding: 0.8rem 1rem;
+            background-color: rgba(160, 209, 117, 0.05);
+            border-left: 3px solid var(--accent-green);
+            color: var(--text-main);
+            font-size: 0.9rem;
+            border-radius: 4px;
+            animation: fadeIn 0.3s ease-in-out;
+            line-height: 1.5;
+        }
+
         input[type="text"], input[type="number"], input[type="url"], input[type="password"], textarea {
             width: 100%;
             padding: 0.8rem 1rem;
@@ -497,6 +510,7 @@
                 <label class="tally-option"><input type="radio" name="feedback" value="Ask"><span class="letter">B</span> Ask before making it public</label>
                 <label class="tally-option"><input type="radio" name="feedback" value="Private"><span class="letter">C</span> I just want a private feedback</label>
             </div>
+            <div id="feedbackCallout" class="feedback-callout hidden"></div>
         </div>
 
         <div class="submit-container">
@@ -637,6 +651,21 @@
         } else {
             groupComments.classList.add('hidden');
         }
+
+        // Feedback Message (Lógica Nueva)
+        const feedbackCallout = document.getElementById('feedbackCallout');
+        if (state.feedback === 'Public') {
+            feedbackCallout.textContent = "As soon as I play and analyze your level, I will upload the feedback publicly on Ko-fi without asking you.";
+            feedbackCallout.classList.remove('hidden');
+        } else if (state.feedback === 'Ask') {
+            feedbackCallout.textContent = "If you are not sure right now, you can select this option and I will ask you once the feedback is complete if you want it to be public or not. I will show you the feedback before making it public.";
+            feedbackCallout.classList.remove('hidden');
+        } else if (state.feedback === 'Private') {
+            feedbackCallout.textContent = "I will give you all the feedback of your level privately, and only you will be able to see it.";
+            feedbackCallout.classList.remove('hidden');
+        } else {
+            feedbackCallout.classList.add('hidden');
+        }
     }
 
     formInputs.forEach(input => {
@@ -722,7 +751,6 @@
                 messageDiv.style.color = "var(--accent-green)";
                 messageDiv.style.borderColor = "var(--accent-green)";
                 
-                // MODIFICADO: Mensaje personalizado con enlace de seguimiento
                 messageDiv.innerHTML = `✅ ${result.message}<br>
                                        <span style="display: block; margin-top: 0.3rem;">You can track your level status <a href="tracking.html" style="color: inherit; text-decoration: underline; font-weight: 700;">pressing here</a>.</span>`;
                 
