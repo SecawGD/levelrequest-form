@@ -96,7 +96,6 @@
             animation: fadeIn 0.3s ease-in-out;
         }
 
-        /* Nuevo estilo para la descripción dinámica del feedback */
         .feedback-callout {
             margin-top: 1rem;
             padding: 0.8rem 1rem;
@@ -652,7 +651,7 @@
             groupComments.classList.add('hidden');
         }
 
-        // Feedback Message (Lógica Nueva)
+        // Feedback Message
         const feedbackCallout = document.getElementById('feedbackCallout');
         if (state.feedback === 'Public') {
             feedbackCallout.textContent = "As soon as I play and analyze your level, I will upload the feedback publicly on Ko-fi without asking you.";
@@ -688,15 +687,26 @@
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         
-        let selectedTags = Array.from(document.querySelectorAll('input[name="tags"]:checked')).map(cb => cb.value);
-        if (selectedTags.length === 0) {
+        let selectedTagsRaw = Array.from(document.querySelectorAll('input[name="tags"]:checked')).map(cb => cb.value);
+        if (selectedTagsRaw.length === 0) {
             alert("Please select at least one tag.");
             return;
         }
-        if (selectedTags.includes('Other')) {
-            const otherVal = document.getElementById('otherTagInput').value;
-            if(otherVal) selectedTags.push(`Other: ${otherVal}`);
+        
+        // --- NUEVA LÓGICA DE ETIQUETAS PARA MOSTRARLAS EN LISTA ---
+        let finalTagsArray = [];
+        for (let tag of selectedTagsRaw) {
+            if (tag === 'Other') {
+                const otherVal = document.getElementById('otherTagInput').value;
+                if (otherVal) finalTagsArray.push(`Other: ${otherVal}`);
+                else finalTagsArray.push('Other'); 
+            } else {
+                finalTagsArray.push(tag);
+            }
         }
+        
+        // Aquí agregamos la viñeta y unimos con el salto de línea (\n)
+        const formattedTags = finalTagsArray.map(t => `• ${t}`).join('\n');
 
         if (state.rated === 'Yes' && starsInput.value === "0") {
             alert("Please select a star rating.");
@@ -720,7 +730,7 @@
             permission: isPermHidden ? 'N/A' : (state.permission || 'N/A'),
             difficulty: state.difficulty,
             video: document.getElementById('video').value || 'N/A',
-            tags: selectedTags.join(', '),
+            tags: formattedTags, // <-- SE ENVÍAN CON EL NUEVO FORMATO AQUÍ
             rated: state.rated,
             stars: state.rated === 'Yes' ? starsInput.value : 'N/A',
             preview: isPreviewHidden ? 'N/A' : state.preview,
