@@ -47,7 +47,7 @@ async function getGoogleAuthToken(env) {
     return tokenData.access_token;
 }
 
-// NUEVO: Función para convertir texto normal a texto Unicode "Bold Sans"
+// Función para convertir texto normal a texto Unicode "Bold Sans"
 function toBoldUnicode(text) {
     const chars = {
         'A': '𝗔', 'B': '𝗕', 'C': '𝗖', 'D': '𝗗', 'E': '𝗘', 'F': '𝗙', 'G': '𝗚', 'H': '𝗛', 'I': '𝗜', 'J': '𝗝', 'K': '𝗞', 'L': '𝗟', 'M': '𝗠', 'N': '𝗡', 'O': '𝗢', 'P': '𝗣', 'Q': '𝗤', 'R': '𝗥', 'S': '𝗦', 'T': '𝗧', 'U': '𝗨', 'V': '𝗩', 'W': '𝗪', 'X': '𝗫', 'Y': '𝗬', 'Z': '𝗭',
@@ -57,7 +57,7 @@ function toBoldUnicode(text) {
     return text.split('').map(char => chars[char] || char).join('');
 }
 
-// NUEVO: Función para convertir texto normal a texto Unicode "Italic Sans"
+// Función para convertir texto normal a texto Unicode "Italic Sans"
 function toItalicUnicode(text) {
     const chars = {
         'A': '𝘈', 'B': '𝘉', 'C': '𝘊', 'D': '𝘋', 'E': '𝘌', 'F': '𝘍', 'G': '𝘎', 'H': '𝘏', 'I': '𝘐', 'J': '𝘑', 'K': '𝘒', 'L': '𝘓', 'M': '𝘔', 'N': '𝘕', 'O': '𝘖', 'P': '𝘗', 'Q': '𝘘', 'R': '𝘙', 'S': '𝘚', 'T': '𝘛', 'U': '𝘜', 'V': '𝘝', 'W': '𝘞', 'X': '𝘟', 'Y': '𝘠', 'Z': '𝘡',
@@ -148,18 +148,18 @@ export async function onRequestPost(context) {
             ratedStr = `${toBoldUnicode("Unrated")} [${diff}] 🛠️❌`;
         }
 
-        // Aplicamos la negrita a "Level" y al ID, y a "by"
-        const boldLevel = toBoldUnicode("Level");
+        // NUEVO: Ahora utiliza el nombre de nivel ingresado, con formato Bold.
+        const boldLevelName = toBoldUnicode(data.levelName || "Unknown Level");
         const boldID = toBoldUnicode(String(data.levelID));
         const boldBy = toBoldUnicode("by");
 
-        const resumenTexto = `✨ • ${boldLevel} ${boldID} ${boldBy} ${nombreReal} • ${ownershipStr}\n🔢 • ${boldID}\n⭐ • ${ratedStr}\n🕒 • ${friendlyDate}`;
+        const resumenTexto = `✨ • ${boldLevelName} ${boldBy} ${nombreReal} • ${ownershipStr}\n🔢 • ${boldID}\n⭐ • ${ratedStr}\n🕒 • ${friendlyDate}`;
         // ------------------------------------------
 
-        // 4. Guardar todos los datos
+        // 4. Guardar todos los datos (Ahora puedes capturar levelName si tienes esa columna)
         const newRowObj = {
             estado: 'Pendiente', fecha: friendlyDate, codigo: data.codigo,
-            levelID: data.levelID, ownership: data.ownership || '', parts: data.parts || '',
+            levelID: data.levelID, levelName: data.levelName || '', ownership: data.ownership || '', parts: data.parts || '',
             permission: data.permission || '', difficulty: data.difficulty || '', video: data.video || '',
             tags: data.tags || '', rated: data.rated || '', stars: data.stars || '',
             preview: data.preview || '', comments: data.comments || '', feedback: data.feedback || '',

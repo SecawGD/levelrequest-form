@@ -374,6 +374,11 @@
         </div>
 
         <div class="question-group">
+            <div class="question-title">Name of your level <span class="req">*</span></div>
+            <input type="text" id="levelName" required placeholder="Stereo Madness">
+        </div>
+
+        <div class="question-group">
             <div class="question-title">Is the level yours? <span class="req">*</span></div>
             <div class="options-list radio-group">
                 <label class="tally-option"><input type="radio" name="ownership" value="Yes" required><span class="letter">A</span> Yes, I made the level</label>
@@ -693,7 +698,6 @@
             return;
         }
         
-        // --- NUEVA LÓGICA DE ETIQUETAS PARA MOSTRARLAS EN LISTA ---
         let finalTagsArray = [];
         for (let tag of selectedTagsRaw) {
             if (tag === 'Other') {
@@ -705,7 +709,6 @@
             }
         }
         
-        // Aquí agregamos la viñeta y unimos con el salto de línea (\n)
         const formattedTags = finalTagsArray.map(t => `• ${t}`).join('\n');
 
         if (state.rated === 'Yes' && starsInput.value === "0") {
@@ -722,15 +725,17 @@
         const isPartsHidden = document.getElementById('group-parts').classList.contains('hidden');
         const isPreviewHidden = document.getElementById('group-preview').classList.contains('hidden');
 
+        // NUEVO: Agregado el levelName al payload enviado a Cloudflare
         const payload = {
             codigo: document.getElementById('codigo').value,
             levelID: document.getElementById('levelID').value,
+            levelName: document.getElementById('levelName').value,
             ownership: state.ownership,
             parts: isPartsHidden ? 'N/A' : (document.getElementById('parts').value || 'N/A'),
             permission: isPermHidden ? 'N/A' : (state.permission || 'N/A'),
             difficulty: state.difficulty,
             video: document.getElementById('video').value || 'N/A',
-            tags: formattedTags, // <-- SE ENVÍAN CON EL NUEVO FORMATO AQUÍ
+            tags: formattedTags, 
             rated: state.rated,
             stars: state.rated === 'Yes' ? starsInput.value : 'N/A',
             preview: isPreviewHidden ? 'N/A' : state.preview,
