@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GD Login Test</title>
+    <style>
+        :root {
+            --bg-main: #131b16; 
+            --bg-input: #1a231d;
+            --border-color: #2c3b31;
+            --text-main: #e0e6e2;
+            --text-muted: #8e9b92;
+            --accent-green: #a0d175;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .login-box {
+            background-color: var(--bg-input);
+            border: 1px solid var(--border-color);
+            padding: 2.5rem;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        h2 { color: var(--accent-green); margin-top: 0; }
+        
+        .token-display {
+            font-size: 1.8rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+            color: #fff;
+            background-color: #000;
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+            border: 1px dashed var(--accent-green);
+        }
+
+        p { color: var(--text-muted); font-size: 0.9rem; line-height: 1.5; }
+
+        input {
+            width: 100%;
+            padding: 0.8rem;
+            margin: 1rem 0;
+            background-color: var(--bg-main);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: white;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            background-color: var(--accent-green);
+            color: #000;
+            border: none;
+            padding: 0.8rem;
+            font-weight: bold;
+            font-size: 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        button:hover { opacity: 0.8; }
+
+        #message {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            padding: 0.8rem;
+            border-radius: 4px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-box">
+        <h2>Verify Account</h2>
+        <p>1. Copy this temporary token and paste it in your Geometry Dash <b>Custom</b> field (in Account Settings).</p>
+        
+        <div class="token-display" id="tokenDisplay">SEC-XXXX</div>
+
+        <p>2. Enter your GD Username to verify your identity.</p>
+
+        <form id="loginForm">
+            <input type="text" id="gdUsername" placeholder="e.g. Secaw" required>
+            <button type="submit" id="verifyBtn">Verify Me ➔</button>
+        </form>
+
+        <div id="message"></div>
+    </div>
+
+    <script>
+        // Generar un Token aleatorio (Ej: SEC-9A2F)
+        const randomHex = Math.floor(Math.random() * 65535).toString(16).toUpperCase().padStart(4, '0');
+        const generatedToken = `SEC-${randomHex}`;
+        document.getElementById('tokenDisplay').textContent = generatedToken;
+
+        const form = document.getElementById('loginForm');
+        const messageDiv = document.getElementById('message');
+        const verifyBtn = document.getElementById('verifyBtn');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const username = document.getElementById('gdUsername').value;
+            
+            verifyBtn.textContent = "Verifying on Boomlings...";
+            verifyBtn.disabled = true;
+            messageDiv.style.display = "none";
+
+            try {
+                // Llamamos al archivo verify-login.js en tu servidor
+                const response = await fetch('/verify-login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        username: username, 
+                        token: generatedToken 
+                    })
+                });
+
+                const result = await response.json();
+
+                messageDiv.style.display = "block";
+                if (response.ok) {
+                    messageDiv.style.backgroundColor = "rgba(160, 209, 117, 0.2)";
+                    messageDiv.style.color = "var(--accent-green)";
+                    messageDiv.style.border = "1px solid var(--accent-green)";
+                    messageDiv.innerHTML = result.message;
+                } else {
+                    messageDiv.style.backgroundColor = "rgba(255, 107, 107, 0.2)";
+                    messageDiv.style.color = "var(--warning-red)";
+                    messageDiv.style.border = "1px solid var(--warning-red)";
+                    messageDiv.innerHTML = result.error;
+                }
+            } catch (err) {
+                messageDiv.style.display = "block";
+                messageDiv.innerHTML = "❌ Error conectando al servidor.";
+            }
+
+            verifyBtn.textContent = "Verify Me ➔";
+            verifyBtn.disabled = false;
+        });
+    </script>
+</body>
+</html>
