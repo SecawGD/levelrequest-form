@@ -4,13 +4,12 @@ async function getGoogleAuthToken(env) {
     const now = Math.floor(Date.now() / 1000);
     const claim = {
         iss: env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-        scope: 'https://www.googleapis.com/auth/spreadsheets', // Corregido: Se eliminaron los < >
-        aud: 'https://oauth2.googleapis.com/token',            // Corregido: Se eliminaron los < >
+        scope: 'https://www.googleapis.com/auth/spreadsheets', 
+        aud: 'https://oauth2.googleapis.com/token',            
         exp: now + 3600,
         iat: now
     };
 
-    // Corregido: Expresiones regulares arregladas (/\+/g en vez de /\\+/g)
     const encodedHeader = btoa(JSON.stringify(header)).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
     const encodedClaim = btoa(JSON.stringify(claim)).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
     const signatureInput = `${encodedHeader}.${encodedClaim}`;
@@ -38,7 +37,7 @@ async function getGoogleAuthToken(env) {
     const encodedSignature = btoa(binarySignature).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
     const jwt = `${signatureInput}.${encodedSignature}`;
 
-    const tokenResponse = await fetch('https://oauth2.googleapis.com/token', { // Corregido: Se eliminaron los < >
+    const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: `grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Ajwt-bearer&assertion=${jwt}`
@@ -115,13 +114,38 @@ export async function onRequestPost(context) {
             }
         }
 
+        // --- LÓGICA DE CONSTRUCCIÓN DEL RESUMEN ---
+        
+        // Determinar Ownership (Solo, Collab, Unrelated)
+        let ownershipStr = "Unrelated 👤❌";
+        if (data.ownership === 'Yes') ownershipStr = "Solo 👤";
+        else if (data.ownership === 'Partially') ownershipStr = "Collab 👥";
+
+        // Determinar Estrellas / Dificultad
+        let ratedStr = "";
+        if (data.rated === 'Yes') {
+            ratedStr = `Rated ${data.stars}* 🛠️`;
+        } else {
+            // Asume Unrated
+            const diff = data.difficulty || "Unknown";
+            ratedStr = `Unrated ${diff} 🛠️❌`;
+        }
+
+        // Construir bloque de texto con saltos de línea (\n)
+        // NOTA: Como no pedimos el nombre del nivel en el formulario aún, usamos "Level [ID]".
+        const resumenTexto = `✨ • Level ${data.levelID} by ${nombreReal} • ${ownershipStr}\n🔢 • ${data.levelID}\n⭐ • ${ratedStr}\n🕒 • ${friendlyDate}`;
+        // ------------------------------------------
+
         // 4. Guardar todos los datos
         const newRowObj = {
             estado: 'Pendiente', fecha: friendlyDate, codigo: data.codigo,
             levelID: data.levelID, ownership: data.ownership || '', parts: data.parts || '',
             permission: data.permission || '', difficulty: data.difficulty || '', video: data.video || '',
             tags: data.tags || '', rated: data.rated || '', stars: data.stars || '',
-            preview: data.preview || '', comments: data.comments || '', feedback: data.feedback || ''
+            preview: data.preview || '', comments: data.comments || '', feedback: data.feedback || '',
+            // Se asocia a la nueva columna sin importar si escribiste "Resumen" o "resumen" en Sheets
+            Resumen: resumenTexto,
+            resumen: resumenTexto 
         };
 
         const rowArrayToInsert = nivelesHeaders.map(header => newRowObj[header] !== undefined ? newRowObj[header] : '');
