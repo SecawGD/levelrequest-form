@@ -47,6 +47,26 @@ async function getGoogleAuthToken(env) {
     return tokenData.access_token;
 }
 
+// NUEVO: Función para convertir texto normal a texto Unicode "Bold Sans"
+function toBoldUnicode(text) {
+    const chars = {
+        'A': '𝗔', 'B': '𝗕', 'C': '𝗖', 'D': '𝗗', 'E': '𝗘', 'F': '𝗙', 'G': '𝗚', 'H': '𝗛', 'I': '𝗜', 'J': '𝗝', 'K': '𝗞', 'L': '𝗟', 'M': '𝗠', 'N': '𝗡', 'O': '𝗢', 'P': '𝗣', 'Q': '𝗤', 'R': '𝗥', 'S': '𝗦', 'T': '𝗧', 'U': '𝗨', 'V': '𝗩', 'W': '𝗪', 'X': '𝗫', 'Y': '𝗬', 'Z': '𝗭',
+        'a': '𝗮', 'b': '𝗯', 'c': '𝗰', 'd': '𝗱', 'e': '𝗲', 'f': '𝗳', 'g': '𝗴', 'h': '𝗵', 'i': '𝗶', 'j': '𝗷', 'k': '𝗸', 'l': '𝗹', 'm': '𝗺', 'n': '𝗻', 'o': '𝗼', 'p': '𝗽', 'q': '𝗾', 'r': '𝗿', 's': '𝘀', 't': '𝘁', 'u': '𝘂', 'v': '𝘃', 'w': '𝘄', 'x': '𝘅', 'y': '𝘆', 'z': '𝘇',
+        '0': '𝟬', '1': '𝟭', '2': '𝟮', '3': '𝟯', '4': '𝟰', '5': '𝟱', '6': '𝟲', '7': '𝟳', '8': '𝟴', '9': '𝟵'
+    };
+    return text.split('').map(char => chars[char] || char).join('');
+}
+
+// NUEVO: Función para convertir texto normal a texto Unicode "Italic Sans"
+function toItalicUnicode(text) {
+    const chars = {
+        'A': '𝘈', 'B': '𝘉', 'C': '𝘊', 'D': '𝘋', 'E': '𝘌', 'F': '𝘍', 'G': '𝘎', 'H': '𝘏', 'I': '𝘐', 'J': '𝘑', 'K': '𝘒', 'L': '𝘓', 'M': '𝘔', 'N': '𝘕', 'O': '𝘖', 'P': '𝘗', 'Q': '𝘘', 'R': '𝘙', 'S': '𝘚', 'T': '𝘛', 'U': '𝘜', 'V': '𝘝', 'W': '𝘞', 'X': '𝘟', 'Y': '𝘠', 'Z': '𝘡',
+        'a': '𝘢', 'b': '𝘣', 'c': '𝘤', 'd': '𝘥', 'e': '𝘦', 'f': '𝘧', 'g': '𝘨', 'h': '𝘩', 'i': '𝘪', 'j': '𝘫', 'k': '𝘬', 'l': '𝘭', 'm': '𝘮', 'n': '𝘯', 'o': '𝘰', 'p': '𝘱', 'q': '𝘲', 'r': '𝘳', 's': '𝘴', 't': '𝘵', 'u': '𝘶', 'v': '𝘷', 'w': '𝘸', 'x': '𝘹', 'y': '𝘺', 'z': '𝘻'
+    };
+    return text.split('').map(char => chars[char] || char).join('');
+}
+
+
 export async function onRequestPost(context) {
     const { request, env } = context;
 
@@ -114,26 +134,26 @@ export async function onRequestPost(context) {
             }
         }
 
-        // --- LÓGICA DE CONSTRUCCIÓN DEL RESUMEN ---
+        // --- LÓGICA DE CONSTRUCCIÓN DEL RESUMEN CON FORMATO ---
         
-        // Determinar Ownership (Solo, Collab, Unrelated)
-        let ownershipStr = "Unrelated 👤❌";
-        if (data.ownership === 'Yes') ownershipStr = "Solo 👤";
-        else if (data.ownership === 'Partially') ownershipStr = "Collab 👥";
+        let ownershipStr = toItalicUnicode("Unrelated") + " 👤❌";
+        if (data.ownership === 'Yes') ownershipStr = toItalicUnicode("Solo") + " 👤";
+        else if (data.ownership === 'Partially') ownershipStr = toItalicUnicode("Collab") + " 👥";
 
-        // Determinar Estrellas / Dificultad
         let ratedStr = "";
         if (data.rated === 'Yes') {
-            ratedStr = `Rated ${data.stars}* 🛠️`;
+            ratedStr = `${toBoldUnicode("Rated")} ${toBoldUnicode(data.stars + "*")} 🛠️`;
         } else {
-            // Asume Unrated
             const diff = data.difficulty || "Unknown";
-            ratedStr = `Unrated ${diff} 🛠️❌`;
+            ratedStr = `${toBoldUnicode("Unrated")} [${diff}] 🛠️❌`;
         }
 
-        // Construir bloque de texto con saltos de línea (\n)
-        // NOTA: Como no pedimos el nombre del nivel en el formulario aún, usamos "Level [ID]".
-        const resumenTexto = `✨ • Level ${data.levelID} by ${nombreReal} • ${ownershipStr}\n🔢 • ${data.levelID}\n⭐ • ${ratedStr}\n🕒 • ${friendlyDate}`;
+        // Aplicamos la negrita a "Level" y al ID, y a "by"
+        const boldLevel = toBoldUnicode("Level");
+        const boldID = toBoldUnicode(String(data.levelID));
+        const boldBy = toBoldUnicode("by");
+
+        const resumenTexto = `✨ • ${boldLevel} ${boldID} ${boldBy} ${nombreReal} • ${ownershipStr}\n🔢 • ${boldID}\n⭐ • ${ratedStr}\n🕒 • ${friendlyDate}`;
         // ------------------------------------------
 
         // 4. Guardar todos los datos
@@ -143,7 +163,6 @@ export async function onRequestPost(context) {
             permission: data.permission || '', difficulty: data.difficulty || '', video: data.video || '',
             tags: data.tags || '', rated: data.rated || '', stars: data.stars || '',
             preview: data.preview || '', comments: data.comments || '', feedback: data.feedback || '',
-            // Se asocia a la nueva columna sin importar si escribiste "Resumen" o "resumen" en Sheets
             Resumen: resumenTexto,
             resumen: resumenTexto 
         };
