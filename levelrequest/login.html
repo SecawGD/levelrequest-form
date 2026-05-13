@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GD Login</title>
+    <style>
+        :root {
+            --bg-main: #131b16; 
+            --bg-input: #1a231d;
+            --border-color: #2c3b31;
+            --text-main: #e0e6e2;
+            --text-muted: #8e9b92;
+            --accent-green: #a0d175;
+            --warning-red: #ff6b6b;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            margin: 0;
+            padding: 3rem 1.5rem;
+            display: flex;
+            justify-content: center;
+            line-height: 1.5;
+        }
+
+        .form-container {
+            width: 100%;
+            max-width: 500px;
+        }
+
+        h1 {
+            color: var(--accent-green);
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .header-subtext {
+            color: var(--text-muted);
+            margin-bottom: 2.5rem;
+        }
+
+        .question-group {
+            margin-bottom: 1.5rem;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .question-title {
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background-color: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-main);
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--text-muted);
+            background-color: #1e2821;
+        }
+
+        .submit-btn {
+            background-color: #000;
+            color: var(--accent-green);
+            border: none;
+            padding: 0.8rem 1.5rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: opacity 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .submit-btn:hover {
+            opacity: 0.8;
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .token-card {
+            margin-top: 2rem;
+            background-color: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            animation: fadeIn 0.4s ease-in-out;
+            text-align: center;
+        }
+
+        .token-display {
+            font-size: 2rem;
+            font-family: monospace;
+            letter-spacing: 4px;
+            color: var(--accent-green);
+            background-color: #000;
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1.5rem 0;
+            user-select: all;
+        }
+
+        .instruction-list {
+            text-align: left;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            padding-left: 1.2rem;
+        }
+
+        .instruction-list li {
+            margin-bottom: 0.8rem;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        #message {
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            padding: 1rem;
+            border-radius: 6px;
+            background-color: var(--bg-input);
+            border: 1px solid var(--border-color);
+            text-align: center;
+            word-wrap: break-word;
+            line-height: 1.6;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <h1>Link GD Account</h1>
+    <div class="header-subtext">Verify your identity to access the system.</div>
+
+    <div id="step1-container">
+        <div class="question-group">
+            <div class="question-title">Geometry Dash Username</div>
+            <input type="text" id="gdUsername" placeholder="e.g. RobTop" autocomplete="off">
+        </div>
+        <button class="submit-btn" id="generateTokenBtn">Generate Token ➔</button>
+    </div>
+
+    <div id="step2-container" class="token-card hidden">
+        <div class="question-title" style="font-size: 1.2rem;">Verification Token</div>
+        <div class="token-display" id="tokenValue">------</div>
+        
+        <ul class="instruction-list">
+            <li>Open Geometry Dash and go to <strong>Account > Settings</strong>.</li>
+            <li>Paste this exact token into the <strong>Custom</strong> field.</li>
+            <li>Click <strong>Update</strong> to save changes in-game.</li>
+            <li>Come back here and click Verify.</li>
+        </ul>
+
+        <button class="submit-btn" id="verifyBtn">Verify Account</button>
+    </div>
+
+    <div id="message" class="hidden"></div>
+</div>
+
+<script>
+    const generateTokenBtn = document.getElementById('generateTokenBtn');
+    const gdUsernameInput = document.getElementById('gdUsername');
+    const step1Container = document.getElementById('step1-container');
+    const step2Container = document.getElementById('step2-container');
+    const tokenValue = document.getElementById('tokenValue');
+    const verifyBtn = document.getElementById('verifyBtn');
+    const messageDiv = document.getElementById('message');
+
+    let currentUsername = "";
+    let currentToken = "";
+
+    function generateRandomToken() {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let result = 'SECA-';
+        for (let i = 0; i < 8; i++) {
+            result += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return result;
+    }
+
+    generateTokenBtn.addEventListener('click', () => {
+        currentUsername = gdUsernameInput.value.trim();
+        
+        if (!currentUsername) {
+            showMessage("Please enter your GD Username.", "var(--warning-red)");
+            return;
+        }
+
+        currentToken = generateRandomToken(); 
+        tokenValue.textContent = currentToken;
+        gdUsernameInput.disabled = true;
+        generateTokenBtn.classList.add('hidden');
+        step2Container.classList.remove('hidden');
+        hideMessage();
+    });
+
+    verifyBtn.addEventListener('click', async () => {
+        verifyBtn.innerHTML = "Verifying...";
+        verifyBtn.disabled = true;
+        hideMessage();
+        
+        try {
+            const response = await fetch('/verify-login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    username: currentUsername, 
+                    token: currentToken 
+                })
+            });
+            
+            const result = await response.json();
+            
+            if (response.ok) {
+                step2Container.classList.add('hidden');
+                
+                messageDiv.innerHTML = `✅ ${result.message}<br><br>
+                                        <span style="color: var(--text-muted)">Your Private Access Code is:</span><br>
+                                        <div style="font-size: 2rem; letter-spacing: 3px; color: var(--accent-green); background: #000; padding: 1rem; border-radius: 6px; display: inline-block; margin-top: 0.5rem; user-select: all; font-family: monospace;">
+                                            ${result.accessCode}
+                                        </div><br><br>
+                                        Save it! You will need it to send and track levels.`;
+                messageDiv.style.color = "var(--text-main)";
+                messageDiv.style.borderColor = "var(--accent-green)";
+                messageDiv.classList.remove('hidden');
+                
+                verifyBtn.innerHTML = "Go to Level Request ➔";
+                verifyBtn.disabled = false;
+                
+                verifyBtn.onclick = () => {
+                    window.location.href = 'index.html';
+                };
+                
+                step1Container.appendChild(verifyBtn);
+            } else {
+                showMessage("❌ " + (result.error || "Verification failed."), "var(--warning-red)");
+                verifyBtn.innerHTML = "Verify Account";
+                verifyBtn.disabled = false;
+            }
+        } catch (err) {
+            showMessage("❌ Connection error.", "var(--warning-red)");
+            verifyBtn.innerHTML = "Verify Account";
+            verifyBtn.disabled = false;
+        }
+    });
+
+    function showMessage(text, color) {
+        messageDiv.innerHTML = text;
+        messageDiv.style.color = color;
+        messageDiv.style.borderColor = color;
+        messageDiv.classList.remove('hidden');
+    }
+
+    function hideMessage() {
+        messageDiv.classList.add('hidden');
+    }
+</script>
+
+</body>
+</html>
