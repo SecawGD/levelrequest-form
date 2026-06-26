@@ -66,7 +66,6 @@ function toItalicUnicode(text) {
     return text.split('').map(char => chars[char] || char).join('');
 }
 
-
 export async function onRequestPost(context) {
     const { request, env } = context;
 
@@ -142,7 +141,7 @@ export async function onRequestPost(context) {
 
         let ratedStr = "";
         if (data.rated === 'Yes') {
-            // Evaluamos si usamos estrellas o lunas
+            // Evaluamos si usamos estrellas o lunas para el resumen en Airtable/Sheets
             const rewardIcon = data.levelType === 'Platformer' ? '🌙' : '*';
             ratedStr = `${toBoldUnicode("Rated")} ${toBoldUnicode(data.stars + rewardIcon)} 🛠️`;
         } else {

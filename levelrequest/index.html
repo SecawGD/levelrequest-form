@@ -276,21 +276,42 @@
         .c-red { background-color: var(--tag-red); color: var(--tag-red-text); }
         .c-grey { background-color: var(--tag-grey); color: var(--tag-grey-text); }
 
+        /* --- STYLES FOR REWARDS (STARS & MOONS) --- */
         .stars-container {
             display: flex;
             gap: 0.3rem;
             font-size: 1.8rem;
             cursor: pointer;
-            color: var(--border-color);
         }
 
         .star {
-            transition: color 0.2s;
+            transition: transform 0.15s ease, filter 0.2s ease, color 0.2s ease;
+            user-select: none;
         }
 
-        .star:hover, .star.active {
-            color: #facc15;
+        /* Classic Mode (Stars behavior) */
+        #starRating:not(.is-platformer) .star {
+            color: var(--border-color);
+            filter: none;
+            opacity: 1;
         }
+        #starRating:not(.is-platformer) .star:hover, 
+        #starRating:not(.is-platformer) .star.active {
+            color: #facc15;
+            transform: scale(1.15);
+        }
+
+        /* Platformer Mode (Moons behavior via Filters) */
+        #starRating.is-platformer .star {
+            filter: grayscale(100%) opacity(0.25);
+            color: initial; /* Resets color so the emoji renders properly */
+        }
+        #starRating.is-platformer .star:hover, 
+        #starRating.is-platformer .star.active {
+            filter: grayscale(0%) opacity(1);
+            transform: scale(1.15);
+        }
+        /* ------------------------------------------- */
 
         .hidden {
             display: none !important;
@@ -590,19 +611,22 @@
             }
         });
 
-        // Level Type -> Stars/Moons Texts and Icons
+        // Level Type -> Stars/Moons Texts and Icons CSS Class
         const starsTitle = document.getElementById('stars-title');
         const ratedTitle = document.getElementById('rated-title');
         const starIcons = document.querySelectorAll('.star');
+        const starRatingContainer = document.getElementById('starRating');
         
         if (state.levelType === 'Platformer') {
             if (starsTitle) starsTitle.innerHTML = 'How many moons does your level have? <span class="req">*</span>';
             if (ratedTitle) ratedTitle.innerHTML = 'Is your level moon rated? <span class="req">*</span>';
             starIcons.forEach(s => s.textContent = '🌙');
+            starRatingContainer.classList.add('is-platformer');
         } else {
             if (starsTitle) starsTitle.innerHTML = 'How many stars does your level have? <span class="req">*</span>';
             if (ratedTitle) ratedTitle.innerHTML = 'Is your level star rated? <span class="req">*</span>';
             starIcons.forEach(s => s.textContent = '★');
+            starRatingContainer.classList.remove('is-platformer');
         }
 
         // Ownership
@@ -752,7 +776,7 @@
             codigo: document.getElementById('codigo').value,
             levelID: document.getElementById('levelID').value,
             levelName: document.getElementById('levelName').value,
-            levelType: state.levelType, // <-- SE ENVÍA EL DATO NUEVO AL BACKEND
+            levelType: state.levelType, // Se envía a Cloudflare
             ownership: state.ownership,
             parts: isPartsHidden ? 'N/A' : (document.getElementById('parts').value || 'N/A'),
             permission: isPermHidden ? 'N/A' : (state.permission || 'N/A'),
