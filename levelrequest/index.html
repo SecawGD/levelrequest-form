@@ -379,6 +379,14 @@
         </div>
 
         <div class="question-group">
+            <div class="question-title">What type of level is it? <span class="req">*</span></div>
+            <div class="options-list radio-group">
+                <label class="tally-option"><input type="radio" name="levelType" value="Classic" required><span class="letter">A</span> Classic</label>
+                <label class="tally-option"><input type="radio" name="levelType" value="Platformer"><span class="letter">B</span> Platformer</label>
+            </div>
+        </div>
+
+        <div class="question-group">
             <div class="question-title">Is the level yours? <span class="req">*</span></div>
             <div class="options-list radio-group">
                 <label class="tally-option"><input type="radio" name="ownership" value="Yes" required><span class="letter">A</span> Yes, I made the level</label>
@@ -470,7 +478,7 @@
         <div class="sub-text" style="margin-bottom: 2.5rem;">This is also very important for me to know</div>
 
         <div class="question-group">
-            <div class="question-title">Is your level star rated? <span class="req">*</span></div>
+            <div class="question-title" id="rated-title">Is your level star rated? <span class="req">*</span></div>
             <div class="sub-text">(I also give feedback on rated levels, but unrated levels have more priority)</div>
             <div class="options-list radio-group">
                 <label class="tally-option"><input type="radio" name="rated" value="No" required><span class="letter">A</span> No</label>
@@ -479,7 +487,7 @@
         </div>
 
         <div class="question-group hidden" id="group-stars">
-            <div class="question-title">How many stars does your level have? <span class="req">*</span></div>
+            <div class="question-title" id="stars-title">How many stars does your level have? <span class="req">*</span></div>
             <div class="stars-container" id="starRating">
                 <span class="star" data-val="1">★</span><span class="star" data-val="2">★</span><span class="star" data-val="3">★</span><span class="star" data-val="4">★</span><span class="star" data-val="5">★</span><span class="star" data-val="6">★</span><span class="star" data-val="7">★</span><span class="star" data-val="8">★</span><span class="star" data-val="9">★</span><span class="star" data-val="10">★</span>
             </div>
@@ -581,6 +589,21 @@
                 state[input.name] = input.value;
             }
         });
+
+        // Level Type -> Stars/Moons Texts and Icons
+        const starsTitle = document.getElementById('stars-title');
+        const ratedTitle = document.getElementById('rated-title');
+        const starIcons = document.querySelectorAll('.star');
+        
+        if (state.levelType === 'Platformer') {
+            if (starsTitle) starsTitle.innerHTML = 'How many moons does your level have? <span class="req">*</span>';
+            if (ratedTitle) ratedTitle.innerHTML = 'Is your level moon rated? <span class="req">*</span>';
+            starIcons.forEach(s => s.textContent = '🌙');
+        } else {
+            if (starsTitle) starsTitle.innerHTML = 'How many stars does your level have? <span class="req">*</span>';
+            if (ratedTitle) ratedTitle.innerHTML = 'Is your level star rated? <span class="req">*</span>';
+            starIcons.forEach(s => s.textContent = '★');
+        }
 
         // Ownership
         const groupReviewScope = document.getElementById('group-review-scope');
@@ -712,7 +735,7 @@
         const formattedTags = finalTagsArray.map(t => `• ${t}`).join('\n');
 
         if (state.rated === 'Yes' && starsInput.value === "0") {
-            alert("Please select a star rating.");
+            alert("Please select a rating value.");
             return;
         }
 
@@ -725,11 +748,11 @@
         const isPartsHidden = document.getElementById('group-parts').classList.contains('hidden');
         const isPreviewHidden = document.getElementById('group-preview').classList.contains('hidden');
 
-        // NUEVO: Agregado el levelName al payload enviado a Cloudflare
         const payload = {
             codigo: document.getElementById('codigo').value,
             levelID: document.getElementById('levelID').value,
             levelName: document.getElementById('levelName').value,
+            levelType: state.levelType, // <-- SE ENVÍA EL DATO NUEVO AL BACKEND
             ownership: state.ownership,
             parts: isPartsHidden ? 'N/A' : (document.getElementById('parts').value || 'N/A'),
             permission: isPermHidden ? 'N/A' : (state.permission || 'N/A'),

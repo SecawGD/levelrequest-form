@@ -142,13 +142,14 @@ export async function onRequestPost(context) {
 
         let ratedStr = "";
         if (data.rated === 'Yes') {
-            ratedStr = `${toBoldUnicode("Rated")} ${toBoldUnicode(data.stars + "*")} 🛠️`;
+            // Evaluamos si usamos estrellas o lunas
+            const rewardIcon = data.levelType === 'Platformer' ? '🌙' : '*';
+            ratedStr = `${toBoldUnicode("Rated")} ${toBoldUnicode(data.stars + rewardIcon)} 🛠️`;
         } else {
             const diff = data.difficulty || "Unknown";
             ratedStr = `${toBoldUnicode("Unrated")} [${diff}] 🛠️❌`;
         }
 
-        // NUEVO: Ahora utiliza el nombre de nivel ingresado, con formato Bold.
         const boldLevelName = toBoldUnicode(data.levelName || "Unknown Level");
         const boldID = toBoldUnicode(String(data.levelID));
         const boldBy = toBoldUnicode("by");
@@ -156,10 +157,10 @@ export async function onRequestPost(context) {
         const resumenTexto = `✨ • ${boldLevelName} ${boldBy} ${nombreReal} • ${ownershipStr}\n🔢 • ${boldID}\n⭐ • ${ratedStr}\n🕒 • ${friendlyDate}`;
         // ------------------------------------------
 
-        // 4. Guardar todos los datos (Ahora puedes capturar levelName si tienes esa columna)
+        // 4. Guardar todos los datos, agregando levelType
         const newRowObj = {
             estado: 'Pendiente', fecha: friendlyDate, codigo: data.codigo,
-            levelID: data.levelID, levelName: data.levelName || '', ownership: data.ownership || '', parts: data.parts || '',
+            levelID: data.levelID, levelName: data.levelName || '', levelType: data.levelType || '', ownership: data.ownership || '', parts: data.parts || '',
             permission: data.permission || '', difficulty: data.difficulty || '', video: data.video || '',
             tags: data.tags || '', rated: data.rated || '', stars: data.stars || '',
             preview: data.preview || '', comments: data.comments || '', feedback: data.feedback || '',
